@@ -1,0 +1,1010 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#F3ECE0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1D1612" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="릴스 메이커">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>새로운뷰티 릴스 메이커</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Bodoni+Moda:ital,wght@0,700;1,700&family=Gaegu:wght@700&family=IBM+Plex+Mono:wght@500;700&family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Serif+KR:wght@500;700&display=swap">
+<style>
+html{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+body{margin:0}img{max-width:100%}[hidden]{display:none!important}
+.app{grid-template-columns:minmax(0,1fr)}
+/* Layout: phone-first editor — 9:16 preview on top, style picker, scene strip, scene editor, sticky export bar. Two columns on wide screens. */
+:root{
+  --bg:#F3ECE0; --paper:#FBF7F0; --fg:#3E2C20; --muted:#8A7564;
+  --wood:#4A3426; --sage:#8FA37E; --sage-soft:#E3E9DA; --apricot:#E2874F; --apricot-soft:#F7DDCB;
+  --line:rgba(74,52,38,.14); --warn:#C0562B;
+  --ui:"Noto Sans KR",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#1D1612; --paper:#2A201A; --fg:#F1E6D6; --muted:#B19C88;
+  --wood:#F1E6D6; --sage:#A9BC97; --sage-soft:#2F3529; --apricot:#EE9A63; --apricot-soft:#3D2A1F;
+  --line:rgba(241,230,214,.14); --warn:#F08A5D; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1D1612; --paper:#2A201A; --fg:#F1E6D6; --muted:#B19C88;
+  --wood:#F1E6D6; --sage:#A9BC97; --sage-soft:#2F3529; --apricot:#EE9A63; --apricot-soft:#3D2A1F;
+  --line:rgba(241,230,214,.14); --warn:#F08A5D; color-scheme:dark}
+html,body{background:var(--bg);color:var(--fg)}
+body{font-family:var(--ui);font-size:15px;line-height:1.5;padding:0 16px;padding-block:12px 110px}
+*{box-sizing:border-box}
+button,input,textarea{font:inherit;color:inherit}
+.app{max-width:1040px;margin:0 auto;display:grid;gap:18px}
+@media (min-width:860px){.app{grid-template-columns:400px minmax(0,1fr);align-items:start}.left{position:sticky;top:12px}}
+header{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap}
+h1{font-size:19px;font-weight:900;letter-spacing:-.02em;margin:0;text-wrap:balance}
+h1 span{color:var(--apricot)}
+.spec{font-size:12px;color:var(--muted);letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.left{display:grid;gap:10px;min-width:0}
+.stage{display:flex;justify-content:center}
+canvas#cv{height:min(58vh,640px);aspect-ratio:9/16;max-width:100%;border-radius:14px;background:#2a211b;box-shadow:0 10px 30px rgba(40,26,16,.18);display:block}
+canvas#cv.drag{touch-action:none;cursor:grab}
+.transport{display:flex;align-items:center;gap:10px}
+.play{width:44px;height:44px;border-radius:50%;border:0;background:var(--wood);color:var(--bg);font-size:16px;cursor:pointer;flex:none}
+#scrub{flex:1;min-width:0;accent-color:var(--apricot)}
+.time{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;width:72px;text-align:right}
+.right{display:grid;gap:16px;min-width:0}
+.label{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.select-wrap{position:relative}
+.select-wrap::after{content:"";position:absolute;right:16px;top:50%;width:9px;height:9px;border-right:2px solid var(--fg);border-bottom:2px solid var(--fg);transform:translateY(-70%) rotate(45deg);pointer-events:none}
+#styleSel{width:100%;appearance:none;-webkit-appearance:none;border:1.5px solid var(--apricot);background:var(--apricot-soft);color:var(--fg);border-radius:12px;padding:13px 44px 13px 14px;font:inherit;font-size:16px;font-weight:700;cursor:pointer}
+.sty{border:1.5px solid var(--line);background:var(--paper);border-radius:10px;padding:8px 8px 7px;text-align:left;cursor:pointer;display:grid;gap:1px;min-width:0}
+.sty .no{font-size:10.5px;font-weight:900;color:var(--apricot);font-variant-numeric:tabular-nums}
+.sty b{font-size:12.5px;line-height:1.25;word-break:keep-all}
+.sty small{font-size:10px;color:var(--muted);line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sty.on{border-color:var(--apricot);background:var(--apricot-soft)}
+.sty-detail{display:grid;gap:6px}
+.sty-detail h2{margin:0;font-size:16px;font-weight:900;letter-spacing:-.01em}
+.sty-detail h2 small{font-size:12px;font-weight:500;color:var(--muted);margin-left:6px}
+.sty-detail p{margin:0;font-size:13.5px}
+.sty-detail .ex{font-size:12.5px;color:var(--muted)}
+.meta{display:flex;gap:6px;flex-wrap:wrap}
+.meta span{font-size:11.5px;background:var(--sage-soft);border-radius:999px;padding:2px 9px;font-weight:700}
+.strip{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.chip{flex:none;width:84px;height:120px;border-radius:10px;border:2px solid transparent;background:var(--paper);position:relative;overflow:hidden;cursor:pointer;padding:0;text-align:left}
+.chip.on{border-color:var(--apricot)}
+.chip img,.chip .ph{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.chip .ph{background:linear-gradient(160deg,var(--sage-soft),var(--apricot-soft))}
+.chip .cap{position:absolute;left:0;right:0;bottom:0;padding:5px 6px;font-size:11px;line-height:1.25;color:#FFF8EE;background:linear-gradient(transparent,rgba(30,20,14,.78));font-weight:700}
+.chip .n{position:absolute;top:5px;left:6px;font-size:11px;font-weight:900;color:#FFF8EE;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+.chip .tag{position:absolute;top:5px;right:5px;font-size:10px;background:rgba(30,20,14,.6);color:#FFF8EE;border-radius:6px;padding:0 5px}
+.chip.add{border:2px dashed var(--line);background:transparent;display:grid;place-items:center;color:var(--muted);font-size:13px;text-align:center}
+.total{font-variant-numeric:tabular-nums;font-weight:700;letter-spacing:0;text-transform:none;font-size:12px}
+.total.off{color:var(--warn)}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:14px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:9px 12px;cursor:pointer;font-size:14px;font-weight:500}
+.btn:hover{border-color:var(--sage)}
+.btn.sm{padding:5px 10px;font-size:13px}
+.btn.accent{background:var(--sage-soft);border-color:transparent}
+.btn.danger{color:var(--warn)}
+.btn:disabled{opacity:.45;cursor:default}
+:focus-visible{outline:2px solid var(--apricot);outline-offset:2px}
+.field{display:grid;gap:6px}
+.field label{font-size:13px;font-weight:700}
+.field .hint{font-size:12px;color:var(--muted)}
+textarea,input[type=text]{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:10px 12px;resize:vertical;font-size:16px}
+textarea{min-height:76px;font-weight:700}
+.dur{display:flex;align-items:center;gap:8px}
+.dur output{min-width:58px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
+.media-name{font-size:13px;color:var(--muted);overflow-wrap:anywhere;min-width:0}
+.blurbox{border-top:1px solid var(--line);padding-top:12px;display:grid;gap:10px}
+.blurbox input[type=range]{width:100%;accent-color:var(--sage)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{border:0;background:transparent;padding:6px 12px;cursor:pointer;font-size:13px}
+.seg button.on{background:var(--wood);color:var(--bg)}
+.hooks{display:flex;gap:6px;flex-wrap:wrap}
+.hook-box{display:grid;gap:8px;border-top:1px dashed var(--line);padding-top:10px}
+.hook-tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.hook-tabs::-webkit-scrollbar{display:none}
+.hook-tabs button{flex:none;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:5px 12px;font-size:12.5px;font-weight:700;cursor:pointer;min-height:32px}
+.hook-tabs button.on{background:var(--wood);color:var(--bg);border-color:transparent}
+.hooks button{border:1px solid var(--line);background:transparent;border-radius:999px;padding:4px 10px;font-size:12px;cursor:pointer}
+.hooks button:hover{background:var(--apricot-soft)}
+.bar{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(10px);border-top:1px solid var(--line);z-index:5}
+.bar-in{max-width:1040px;margin:0 auto;display:flex;gap:10px;align-items:center}
+.export{flex:1;border:0;border-radius:12px;padding:14px;background:var(--apricot);color:#2B1A10;font-weight:900;font-size:16px;cursor:pointer;position:relative;overflow:hidden}
+.export .fill{position:absolute;inset:0 auto 0 0;background:rgba(255,255,255,.35);width:0}
+.export span{position:relative}
+.export:disabled{cursor:progress}
+.result{display:grid;gap:10px}
+.result video{width:160px;aspect-ratio:9/16;border-radius:10px;background:#000}
+.note{font-size:12.5px;color:var(--muted)}
+.filebtn{position:relative;overflow:hidden;display:inline-flex;align-items:center}
+.filebtn input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:40px}
+.filebtn:focus-within{outline:2px solid var(--apricot);outline-offset:2px}
+.sr-file{position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0}
+.panel,.right,.left{grid-template-columns:minmax(0,1fr)}
+.toggle{display:flex;align-items:center;gap:8px;font-size:13px;min-height:40px}
+.toggle input{width:20px;height:20px;accent-color:var(--apricot)}
+.btn{min-height:40px}.btn.sm{min-height:34px}
+.install{display:grid;gap:8px;background:var(--sage-soft);border-radius:14px;padding:14px 16px}
+.install b{font-size:14px}
+.install .row{justify-content:space-between}
+@media (max-width:859px){
+  body{padding-block:0 120px;overscroll-behavior-y:contain}
+  .app{gap:14px}
+  .left{position:sticky;top:0;z-index:4;background:var(--bg);margin:0 -16px;padding:calc(env(safe-area-inset-top,0px) + 8px) 16px 10px;border-bottom:1px solid var(--line);gap:8px}
+  header{align-items:center}
+  h1{font-size:16px}
+  .spec{font-size:11px}
+  canvas#cv{height:min(38dvh,340px);height:min(38vh,340px);border-radius:12px}
+  @supports (height:1dvh){canvas#cv{height:min(38dvh,340px)}}
+  .play{width:40px;height:40px}
+  .panel{padding:14px;border-radius:12px}
+  .chip{width:76px;height:108px}
+  .export{padding:15px;font-size:16px}
+}
+@media (display-mode:standalone){.install{display:none!important}}
+.ai{border:1px solid color-mix(in srgb,var(--apricot) 40%,transparent);background:var(--apricot-soft);border-radius:12px;padding:12px;display:grid;gap:10px}
+.ai-btn{border:0;background:var(--wood);color:var(--bg);border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer;font-size:14px}
+.ai-btn:disabled{opacity:.5;cursor:progress}
+.sugs{display:grid;gap:8px}
+.sug{text-align:left;border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:10px 12px;cursor:pointer;display:grid;gap:2px}
+.sug:hover{border-color:var(--apricot)}
+.sug b{font-size:15px;white-space:pre-line;line-height:1.35}
+.sug b em{font-style:normal;color:var(--apricot)}
+.sug span{font-size:12.5px;color:var(--muted)}
+.sug small{font-size:11.5px;color:var(--muted);opacity:.85}
+.plan-list{display:grid;gap:6px;margin:0;padding-left:20px}
+.plan-list li{font-size:13.5px}
+.plan-list li b{white-space:pre-line}
+.plan-list li b em{font-style:normal;color:var(--apricot)}
+.thinking{font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:center}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--apricot);animation:pulse 1s infinite alternate}
+@keyframes pulse{to{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.dot{animation:none}}
+</style>
+
+</head>
+<body>
+<div class="app">
+  <div class="left">
+    <header>
+      <h1>새로운뷰티 <span>릴스</span> 메이커</h1>
+      <div class="spec" id="spec">9:16 · 애플 키네틱</div>
+    </header>
+    <div class="stage"><canvas id="cv" width="720" height="1280" aria-label="릴스 미리보기"></canvas></div>
+    <div class="transport">
+      <button class="play" id="playBtn" aria-label="재생">▶</button>
+      <input type="range" id="scrub" min="0" max="15" step="0.01" value="0" aria-label="재생 위치">
+      <div class="time" id="time">0.0 / 15.0s</div>
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="install" id="install" hidden>
+      <b>홈 화면에 설치하면 앱처럼 써요</b>
+      <div class="note" id="installHow"></div>
+      <div class="row"><button class="btn accent" id="installBtn" hidden>앱 설치</button><button class="btn sm" id="installClose">닫기</button></div>
+    </div>
+
+    <div class="panel">
+      <div class="label"><span>영상 스타일</span></div>
+      <div class="pick-row">
+        <div class="select-wrap"><select id="styleSel" aria-label="영상 스타일 선택"></select></div>
+      </div>
+      <div class="field">
+        <label>글씨체</label>
+        <div class="seg" role="group" aria-label="글씨체" id="fontSeg"><button data-f="unified">잘 보이게 통일</button><button data-f="style">스타일별 개성</button></div>
+      </div>
+      <div class="sty-detail" id="styDetail"></div>
+    </div>
+
+    <div>
+      <div class="label"><span>장면 순서</span><span class="total" id="total"></span></div>
+      <div class="strip" id="strip"></div>
+    </div>
+
+    <div class="ai" id="planBox" hidden></div>
+
+    <div class="panel" id="panel"></div>
+
+    <div class="panel">
+      <label class="toggle"><input type="checkbox" id="badge"> 장면 위쪽에 '새로운뷰티' 로고 표시 (키네틱·스플릿)</label>
+      <div class="note">글자는 화면 중간~위쪽에 들어가서 피드 썸네일과 하단 캡션에 가려지지 않아요. 음악은 인스타그램 업로드할 때 넣어주세요.</div>
+    </div>
+
+    <div class="panel result" id="result" hidden>
+      <div class="label"><span>완성된 영상</span></div>
+      <div class="row" style="align-items:flex-start">
+        <video id="outVid" controls playsinline muted></video>
+        <div style="display:grid;gap:8px;flex:1;min-width:160px">
+          <button class="btn accent" id="saveBtn">앨범에 저장 · 공유</button>
+          <div class="note" id="saveMsg"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="bar"><div class="bar-in">
+  <button class="export" id="exportBtn"><div class="fill" id="fill"></div><span id="exportLabel">MP4로 만들기</span></button>
+</div></div>
+
+<input type="file" id="file" accept="image/*,video/*" class="sr-file" tabindex="-1" aria-hidden="true">
+
+<script>
+(()=>{
+const W=720,H=1280,FPS=30,YEAR=new Date().getFullYear();
+const C={cream:'#F6EFE3',ivory:'#FFF8EE',wood:'#4A3426',woodDeep:'#2E2018',sage:'#9CAF88',apricot:'#E8935A',apricotDeep:'#D9773F'};
+const SANS='"Noto Sans KR","Apple SD Gothic Neo",sans-serif',SERIF='"Noto Serif KR","Apple SD Gothic Neo",serif',
+  BODONI='"Bodoni Moda","Noto Serif KR",serif',ANTON='"Anton","Noto Sans KR",sans-serif',MONO='"IBM Plex Mono","Noto Sans KR",monospace',HAND='"Gaegu","Noto Sans KR",sans-serif';
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+const tmp=document.createElement('canvas'),tctx=tmp.getContext('2d');
+const BEAT=60/128;
+
+/* ---------- styles ---------- */
+const ST={
+ kinetic:{no:1,name:'애플 키네틱 타이포그래피',en:'Apple Kinetic Type',len:15,rec:'15초 · 한 화면 한 메시지',
+  desc:'크고 두꺼운 글자가 한 줄씩 올라오는 깔끔한 하드컷 영상이에요.',ex:'"아직도 살만 빼세요?" → 3D BODY RESET → 문의',
+  hooks:['아직도 살만 빼세요?','이거 모르면 손해예요','왜 나만 안 빠질까?','40대부터 달라지는 몸','거울 보기 싫으셨죠?'],
+  rule:'호기심·불안을 자극하는 후킹형. 큰 문구 1~2줄, 한 줄 10자 이내.',
+  preset:[{main:'덜 먹는데\n왜 *안 빠질까*?',dur:2.5},{main:'살이 아니라\n*자세*가 찐 거예요',dur:3},{main:'*3D BODY RESET*',sub:'체형 균형부터 다시',dur:3.5},{main:'옆모습부터\n*달라져요*',dur:3},{main:'새로운뷰티',sub:'지금 문의주세요',note:'인천 연수구 · 네이버 예약',dur:3,kind:'cta'}]},
+ cinema:{no:2,name:'넷플릭스 시네마틱',en:'Cinematic Trailer',len:15,rec:'15초 · 빛과 그림자, 슬로모션',
+  desc:'영화 예고편처럼 어두운 화면, 빛 번짐, 느린 화면, 천천히 떠오르는 글자로 긴장감을 만들어요.',ex:'어두운 화면에 "오늘도 몸은 버텼습니다" → 관리실 장면',
+  hooks:['오늘도 몸은 버텼습니다','쉬지 못한 근육은 기억합니다','당신의 몸이 보내는 마지막 신호'],
+  rule:'영화 예고편 나레이션처럼 짧고 묵직한 문장. 마침표 톤. 큰 문구 1~2줄, 한 줄 12자 이내.',
+  preset:[{main:'오늘도\n몸은 버텼습니다',dur:3.5},{main:'쉬지 못한 근육은\n*기억*합니다',dur:3,slow:true},{main:'이제는\n풀어줄 시간',dur:3,slow:true},{main:'*3D BODY RESET*',sub:'몸의 균형을 다시 쓰다',dur:2.5},{main:'새로운뷰티',sub:'지금 문의주세요',note:'인천 연수구 · 네이버 예약',dur:3,kind:'cta'}]},
+ vogue:{no:3,name:'보그 매거진 에디토리얼',en:'Fashion Editorial Motion',len:12,rec:'12초 · 여백과 대형 타이틀',
+  desc:'패션 화보처럼 여백을 두고 사진을 프레임에 담아, 큰 영문 타이틀과 짧은 한글 캡션을 얹어요.',ex:'관리 기기·공간·상담을 화보처럼 "THE ART OF BODY BALANCE"',
+  hooks:['THE ART OF *BODY BALANCE*','*DETAIL*','QUIET RECOVERY'],
+  rule:'큰 문구는 영어 대문자 화보 타이틀(2~4단어, 1~2줄). 작은 문구는 한국어 감성 캡션 14자 이내.',
+  preset:[{main:'THE ART OF\n*BODY BALANCE*',sub:'몸의 균형을 디자인하다',dur:3},{main:'*DETAIL*',sub:'손끝으로 읽는 체형',dur:2.5},{main:'QUIET\nRECOVERY',sub:'조용히 회복되는 시간',dur:2.5},{main:'NEW BEAUTY',sub:'예약 · 문의주세요',note:'새로운뷰티 · 인천 연수구',dur:4,kind:'cta'}]},
+ nike:{no:4,name:'나이키 비트 싱크',en:'Beat Sync / Speed Ramp',len:9,rec:'7~12초 · 강한 시선 집중',bpm:true,
+  desc:'128BPM 박자에 맞춰 화면이 빠르게 바뀌고, 박자마다 화면이 튀고, 중요한 장면은 슬로모션이 들어가요.',ex:'승모근 → 등 → 골반 → 관리 기기 → 새로운뷰티 로고',
+  hooks:['승모근','등','골반','다 *풀린다*'],
+  rule:'단어 1~2개만. 아주 짧고 세게. 한 장면에 한 단어 위주.',
+  preset:[{main:'승모근',dur:BEAT*2},{main:'등',dur:BEAT*2},{main:'골반',dur:BEAT*2},{main:'다 *풀린다*',dur:BEAT*4,slow:true},{main:'*3D BODY RESET*',dur:BEAT*3},{main:'새로운뷰티',sub:'지금 문의',dur:BEAT*6,kind:'cta'}]},
+ pov:{no:5,name:'POV 공감형 미니 드라마',en:'POV Micro Story',len:15,rec:'10~20초 · 공감과 공유',
+  desc:'보는 사람이 자기 일처럼 느끼게 하는 일상형 영상이에요. 앱 자막 같은 캡션이 타자 치듯 나와요.',ex:'"POV: 운동은 안 했는데 몸은 매일 운동한 것처럼 피곤함" → 일상 → 원장 반응',
+  hooks:['POV: 운동은 안 했는데 몸은 매일 운동한 것처럼 피곤함','POV: 주말 내내 잤는데 월요일이 더 피곤함'],
+  rule:'첫 장면은 "POV: "로 시작하는 공감 문장. 대화체, 가벼운 반전·유머 가능. 한 줄 14자 이내, 1~2줄.',
+  preset:[{main:'POV: 운동은 안 했는데\n몸은 매일 운동한 것처럼 피곤함',dur:4},{main:'하루 종일 앉아만 있었는데\n왜 어깨가 *돌덩이*?',dur:3.5},{main:'원장님: "이건 피곤이 아니라\n*체형 신호*예요"',dur:4},{main:'새로운뷰티',sub:'피곤한 몸, 문의주세요',note:'인천 연수구 · 네이버 예약',dur:3.5,kind:'cta'}]},
+ hud:{no:6,name:'미래형 스캔 인터페이스',en:'Futuristic HUD / UI Motion',len:15,rec:'12~20초 · 시스템 차별화',
+  desc:'스캔 라인, 격자, 진행 바가 움직이는 기술적인 화면이에요. 항목이 차례로 분석되듯 나타나요.',ex:'바디스캐너 장면 위에 "체형 / 체질 / 체온" 순서대로 → BODY RESET 3D 소개',
+  hooks:['체형\n체질\n체온'],
+  rule:'큰 문구 각 줄은 스캔 항목 이름(2~8자), 한 줄에 하나, 최대 3줄. 숫자나 측정값은 절대 지어내지 말 것.',
+  preset:[{main:'체형\n체질\n체온',sub:'BODY SCAN',dur:4.5},{main:'*3D BODY RESET*',sub:'분석 기반 맞춤 관리',dur:3.5},{main:'틀어진 균형\n*다시 설계*',dur:3.5},{main:'새로운뷰티',sub:'지금 문의주세요',note:'인천 연수구 · 네이버 예약',dur:3.5,kind:'cta'}]},
+ split:{no:7,name:'스플릿 스크린 비교',en:'Split Screen / Contrast Edit',len:12,rec:'10~15초 · 정보 전달과 저장',split:true,
+  desc:'화면을 위아래로 나눠 두 상황을 나란히 보여줘요. 장면마다 사진·영상을 두 개 넣어요.',ex:'"앉아 있을 때의 나 VS 퇴근 후의 나"',
+  hooks:['앉아 있을 때의 나\n퇴근 후의 나','몸을 쓰는 시간\n회복하는 시간'],
+  rule:'큰 문구는 정확히 2줄: 첫 줄 = 위 화면 라벨, 둘째 줄 = 아래 화면 라벨. 각 12자 이내, 대비되게.',
+  preset:[{main:'앉아 있을 때의 나\n퇴근 후의 나',dur:3.5},{main:'몸을 쓰는 시간\n*회복하는 시간*',dur:3.5},{main:'혼자 버틸 때\n*같이 풀 때*',dur:2.5},{main:'새로운뷰티',sub:'지금 문의주세요',note:'인천 연수구 · 네이버 예약',dur:2.5,kind:'cta'}]},
+ vlog:{no:8,name:'미니 브이로그 다큐',en:'Authentic Mini Vlog / BTS',len:15,rec:'15~30초 · 신뢰와 친근감',
+  desc:'꾸미지 않은 원장님의 하루를 기록하듯, 녹화 표시와 시각, 손글씨 자막을 얹어요.',ex:'"인천에서 체형관리샵 운영하는 원장의 오전"을 15초로',
+  hooks:['인천에서 체형관리샵\n운영하는 원장의 *오전*'],
+  rule:'원장 1인칭 일기체. 담백하고 친근하게. 한 줄 12자 이내, 1~2줄.',
+  preset:[{main:'인천에서 체형관리샵\n운영하는 원장의 *오전*',dur:3},{main:'관리실 준비부터',sub:'타월·기기 체크',dur:3},{main:'오늘 첫 상담',sub:'체형부터 같이 봐요',dur:3},{main:'이 순간이\n*제일* 좋아요',dur:3},{main:'새로운뷰티',sub:'편하게 문의주세요',note:'인천 연수구 · 네이버 예약',dur:3,kind:'cta'}]},
+ stop:{no:9,name:'스톱모션 제품 광고',en:'Stop Motion / Match Cut',len:10,rec:'7~15초 · 반복 시청',fps:8,
+  desc:'초당 8장처럼 뚝뚝 끊기는 화면, 색 배경 위 사진 카드, 원형 전환으로 물건이 저절로 움직이는 느낌을 줘요.',ex:'타월 → 관리기기 → 상담 카드 → 예약 카드',
+  hooks:['타월 준비','관리기기 ON','상담 카드','*예약* 완료!'],
+  rule:'물건이나 행동 라벨 2~7자. 아주 짧고 경쾌하게.',
+  preset:[{main:'타월 준비',dur:1.6},{main:'관리기기 ON',dur:1.6},{main:'상담 카드',dur:1.6},{main:'*예약* 완료!',dur:1.7},{main:'새로운뷰티',sub:'지금 문의주세요',dur:3.5,kind:'cta'}]},
+ broll:{no:10,name:'감성 B-roll + 한 줄 자막',en:'Mood B-roll Caption',len:11,rec:'8~12초 · 영상 1개',carry:true,
+  desc:'관리 영상 하나를 천천히 다가가듯 보여주고, 큰 자막만 부드럽게 떠올라요. 영상은 첫 장면에만 넣으면 다음 장면까지 이어져요.',ex:'"나이 들수록 몸이 무거운 이유, 꼭 나이 때문일까요?"',
+  hooks:['나이 들수록\n몸이 무거운 이유','꼭 *나이* 때문일까요?','쉬어도 안 풀리는\n몸의 이유'],
+  rule:'잔잔하고 생각하게 만드는 질문형 자막. 한 장면 1~2줄, 한 줄 12자 이내. 두 장면이 이어지는 한 문장이어도 좋음.',
+  preset:[{main:'나이 들수록\n몸이 무거운 이유',dur:4.5},{main:'꼭 *나이* 때문일까요?',dur:3.5},{main:'새로운뷰티',sub:'지금 문의주세요',note:'인천 연수구 · 네이버 예약',dur:3,kind:'cta'}]},
+ loading:{no:11,name:'0% → 100% 로딩 릴스',en:'Loading Progress',len:13,rec:'10~15초 · 영상 3~4개',
+  desc:'장면마다 진행률 숫자가 올라가는 로딩 화면 스타일이에요. 문구에 쓴 % 숫자까지 카운트가 올라가요.',ex:'관리 준비 0% → 타월 세팅 30% → 기기 준비 70% → 고객님 맞을 준비 100%',
+  hooks:['관리 준비 0%','타월 세팅 30%','기기 준비 70%','고객님 맞을 준비 *100%*'],
+  rule:'각 장면은 "준비 단계 이름 + 숫자%" 형식. 숫자는 0에서 시작해 마지막 일반 장면이 100%가 되도록 차례로 올라감. 한 줄 12자 이내, 1줄.',
+  preset:[{main:'관리 준비 0%',dur:2.5},{main:'타월 세팅 30%',dur:2.5},{main:'기기 준비 70%',dur:2.5},{main:'고객님 맞을 준비 100%',dur:3},{main:'새로운뷰티',sub:'예약 문의주세요',note:'인천 연수구 · 네이버 예약',dur:2.5,kind:'cta'}]},
+ freeze:{no:12,name:'프리즈 프레임 + 짧은 설명',en:'Freeze Frame Callout',len:10,rec:'8~12초 · 영상 1~2개',carry:true,freeze:true,
+  desc:'영상이 흐르다 정해둔 순간에 번쩍하며 멈추고, 큰 문구와 짧은 설명이 스티커처럼 붙어요. 멈추는 시점은 장면마다 정할 수 있어요.',ex:'어깨를 으쓱하는 순간 정지 → "잠깐! 어깨에 계속 힘주고 있나요?"',
+  hooks:['잠깐!','그거 *습관*이에요','이 자세 기억하세요'],
+  rule:'큰 문구는 멈춘 순간에 붙는 짧은 외침(2~8자, 예: "잠깐!"). 작은 문구는 그 순간을 짚는 설명 한 문장(18자 이내). 영상 속 실제 동작을 짚을 것.',
+  preset:[{main:'잠깐!',sub:'어깨에 계속 힘주고 있나요?',dur:4,fz:.4},{main:'그 힘이\n*뭉침*이 돼요',sub:'풀어야 가벼워져요',dur:3.5,fz:.3},{main:'새로운뷰티',sub:'지금 문의주세요',note:'인천 연수구 · 네이버 예약',dur:3,kind:'cta'}]}
+};
+const HOOKS={
+ neg:{name:'부정형',tip:'손해·실수를 짚어서 멈추게 해요.',list:['이렇게 빼면\n*라인*부터 무너져요','풀기만 하면\n*다시 뭉치는* 이유','운동할수록\n*더 틀어지는* 사람 있어요']},
+ cur:{name:'호기심형',tip:'상식을 뒤집어 "왜?"를 떠올리게 해요.',list:['살이 아니라\n*자세*가 찐 거예요','덜 먹는데\n왜 *안 빠질까*?','다리 붓기,\n*골반*부터 보세요']},
+ prob:{name:'문제 제기형',tip:'매일 겪는 고민을 질문으로 던져요.',list:['자고 일어나도\n몸이 무거우세요?','앉으면 배가\n먼저 접히나요?','거울 속 옆모습,\n*자신* 있으세요?']},
+ cmp:{name:'비교형',tip:'두 방식을 나란히. 스플릿 스크린과 잘 맞아요.',list:['살 빼는 관리\n*균형 잡는 관리*','땀 빼는 1시간\n*정렬 잡는 1시간*']},
+ num:{name:'숫자형',tip:'개수를 먼저 밝혀 끝까지 보게 해요.',list:['체형 무너지는 신호\n*3가지*','40대부터 몸이\n달라지는 *이유 1가지*']},
+ res:{name:'결과 먼저형',tip:'실제 관리 영상이 있을 때만 쓰세요.',list:['관리 직후\n*옆모습* 보세요','이 라인,\n*어떻게* 나왔을까요?']},
+ story:{name:'고백형',tip:'원장님 실제 경험일 때만 쓰세요.',list:['원장인 저도\n*틀어진 몸*이었어요']}
+};
+let hookTab='neg';
+const ORDER=['kinetic','cinema','vogue','nike','pov','hud','split','vlog','stop','broll','loading','freeze'];
+
+let uid=1;
+const mk=s=>({id:uid++,main:s.main||'',sub:s.sub||'',note:s.note||'',dur:Math.round((s.dur||3)*1000)/1000,kind:s.kind||'normal',slow:!!s.slow,fz:s.fz!=null?s.fz:.4,blurs:(s.blurs||[]).map(b=>({...b})),media:null,media2:null,mKey:s.mKey||null,m2Key:s.m2Key||null});
+let fontModeSaved='unified',style='kinetic',scenes,showBadge=false,sel=0,selBlur=-1;
+try{const d=JSON.parse(localStorage.getItem('nb-reels-v1')||'null');if(d&&Array.isArray(d.scenes)&&d.scenes.length){scenes=d.scenes.map(mk);showBadge=!!d.badge;if(ST[d.style])style=d.style;if(d.font==='style')fontModeSaved='style'}}catch(e){}
+if(!scenes)scenes=ST.kinetic.preset.map(mk);
+const save=()=>{try{localStorage.setItem('nb-reels-v1',JSON.stringify({style,font:fontMode,badge:showBadge,scenes:scenes.map(({media,media2,id,...r})=>r)}))}catch(e){}};
+const S=()=>ST[style];
+
+let t=0,playing=false,last=0,exporting=false,curScene=-1,lastKey='';
+const total=()=>scenes.reduce((a,s)=>a+s.dur,0);
+const sceneAt=tt=>{let a=0;for(let i=0;i<scenes.length;i++){if(tt<a+scenes[i].dur||i===scenes.length-1)return{i,lt:tt-a,start:a};a+=scenes[i].dur}return{i:0,lt:0,start:0}};
+const startOf=i=>scenes.slice(0,i).reduce((a,s)=>a+s.dur,0);
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
+const easeOut=x=>x>=1?1:1-Math.pow(2,-10*x);
+const easeBack=x=>{const c=1.4;return 1+(c+1)*Math.pow(x-1,3)+c*Math.pow(x-1,2)};
+const rate=s=>s.slow?(style==='nike'?0.35:0.5):1;
+
+/* ---------- drawing helpers ---------- */
+function fill(c){ctx.fillStyle=c;ctx.fillRect(0,0,W,H)}
+function mInfo(m){if(!m)return null;const el=m.el,sw=el.naturalWidth||el.videoWidth,sh=el.naturalHeight||el.videoHeight;return sw?{el,sw,sh}:null}
+function drawCover(m,x,y,w,h,zoom=1,px=0,py=0){const mi=mInfo(m);if(!mi)return false;const k=Math.max(w/mi.sw,h/mi.sh)*zoom,dw=mi.sw*k,dh=mi.sh*k;
+  ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();ctx.drawImage(mi.el,x+(w-dw)/2+px*w,y+(h-dh)/2+py*h,dw,dh);ctx.restore();return true}
+const coverFull=(m,z=1,px=0,py=0)=>drawCover(m,0,0,W,H,z,px,py);
+function placeholder(label='＋ 사진·영상을 넣어주세요',y=H*.72){
+  const g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,C.cream);g.addColorStop(1,'#EADFCD');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='rgba(156,175,136,.35)';ctx.beginPath();ctx.arc(W*.82,H*.78,260,0,7);ctx.fill();
+  ctx.fillStyle='rgba(232,147,90,.28)';ctx.beginPath();ctx.arc(W*.12,H*.92,170,0,7);ctx.fill();
+  hint(label,y,'rgba(74,52,38,.5)');
+}
+function hint(label,y,color){if(exporting)return;ctx.save();ctx.fillStyle=color;ctx.font=`700 28px ${SANS}`;ctx.textAlign='center';ctx.textBaseline='alphabetic';ctx.fillText(label,W/2,y);ctx.restore()}
+function drawBlur(b){
+  const rx=b.r*W,ry=rx*1.25,cx=b.x*W,cy=b.y*H;
+  const x=Math.max(0,cx-rx),y=Math.max(0,cy-ry),w=Math.min(W,cx+rx)-x,h=Math.min(H,cy+ry)-y;
+  if(w<4||h<4)return;
+  const sw=Math.max(2,Math.round(w/16)),sh=Math.max(2,Math.round(h/16));
+  tmp.width=sw;tmp.height=sh;tctx.imageSmoothingEnabled=true;tctx.drawImage(cv,x,y,w,h,0,0,sw,sh);
+  ctx.save();ctx.beginPath();ctx.ellipse(cx,cy,rx,ry,0,0,7);ctx.clip();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+  ctx.drawImage(tmp,0,0,sw,sh,x,y,w,h);ctx.restore();
+}
+const applyBlurs=s=>s.blurs.forEach(drawBlur);
+function parseSegs(line){const out=[];line.split(/(\*[^*]+\*)/).forEach(p=>{if(!p)return;if(p[0]==='*'&&p.endsWith('*')&&p.length>2)out.push({t:p.slice(1,-1),hl:true});else out.push({t:p.replace(/\*/g,''),hl:false})});return out}
+const linesOf=s=>s.main.split('\n').map(x=>x.trim()).filter(Boolean);
+const R_SERIF='@serif',R_BODONI='@bodoni',R_HAND='@hand',R_ANTON='@anton',ROLE={'@serif':SERIF,'@bodoni':BODONI,'@hand':HAND,'@anton':ANTON};
+let fontMode='unified';
+function fstr(w,size,fam,ital){if(fam[0]==='@'){if(fontMode==='unified'){fam=SANS;w=w>=700?900:700;ital=false}else fam=ROLE[fam]}return `${ital?'italic ':''}${w} ${size}px ${fam}`}
+const fnt=(w,size,fam,ital)=>{ctx.font=fstr(w,size,fam,ital)};
+function segW(t,tr){if(!tr)return ctx.measureText(t).width;let w=0;for(const ch of t)w+=ctx.measureText(ch).width+tr;return w}
+function lineW(line,tr=0){return parseSegs(line).reduce((a,s)=>a+segW(s.t,tr),0)-(tr||0)}
+function fitSize(lines,w,base,fam,maxW,ital,tr=0){let size=base;fnt(w,size,fam,ital);const m=Math.max(1,...lines.map(l=>lineW(l,tr*size/base)));if(m>maxW)size=Math.floor(size*maxW/m);return size}
+/* draws rich line; limit = max visible chars */
+function rich(line,x,y,{align='center',tr=0,color,hl,limit=1e9,stroke=null}){
+  const segs=parseSegs(line);const w=lineW(line,tr);let cx=align==='center'?x-w/2:align==='right'?x-w:x;ctx.textAlign='left';let n=0;
+  for(const sg of segs){ctx.fillStyle=sg.hl?hl:color;
+    for(const ch of (tr||limit<1e9?[...sg.t]:[sg.t])){if(n>=limit)return w;const cw=ctx.measureText(ch).width;
+      if(stroke){ctx.strokeStyle=stroke.c;ctx.lineWidth=stroke.w;ctx.strokeText(ch,cx+stroke.dx,y+stroke.dy)}
+      ctx.fillText(ch,cx,y);cx+=cw+tr;n+=[...ch].length}}
+  return w;
+}
+const shadow=(c,b,oy=0)=>{ctx.shadowColor=c;ctx.shadowBlur=b;ctx.shadowOffsetY=oy};
+const noShadow=()=>{ctx.shadowColor='transparent';ctx.shadowBlur=0;ctx.shadowOffsetY=0};
+function pill(text,cx,cy,lt,delay,bg,fg,fs,fam=SANS,outline=false){
+  const p=clamp((lt-delay)/0.4);if(p<=0)return;const e=easeBack(p);
+  fnt(700,fs,fam);const w=ctx.measureText(text).width+fs*1.3,h=fs*1.9;
+  ctx.save();ctx.translate(cx,cy);ctx.scale(.85+.15*e,.85+.15*e);ctx.globalAlpha=clamp(p*2);
+  ctx.beginPath();ctx.roundRect(-w/2,-h/2,w,h,h/2);if(outline){ctx.strokeStyle=bg;ctx.lineWidth=3;ctx.stroke()}else{ctx.fillStyle=bg;ctx.fill()}
+  ctx.fillStyle=fg;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(text,0,1);ctx.restore();
+}
+function fadeText(text,y,lt,delay,font,color){const p=clamp((lt-delay)/0.4);if(p<=0||!text)return;ctx.save();ctx.globalAlpha=p;ctx.font=font;ctx.fillStyle=color;ctx.textAlign='center';ctx.textBaseline='alphabetic';ctx.fillText(text,W/2,y);ctx.restore()}
+function kinetic(lines,cy,lt,opt){
+  const fam=opt.fam||SANS,w=opt.w||900;let size=fitSize(lines,w,opt.size,fam,W-100,opt.ital);fnt(w,size,fam,opt.ital);
+  const lh=size*1.2,top=cy-(lines.length*lh)/2;
+  lines.forEach((line,i)=>{
+    const p=clamp((lt-0.06-i*0.2)/0.42);if(p<=0)return;const e=easeOut(p);const base=top+i*lh+size*0.92;
+    ctx.save();ctx.beginPath();ctx.rect(0,top+i*lh-size*0.1,W,lh+size*0.12);ctx.clip();ctx.textBaseline='alphabetic';
+    if(opt.shadow)shadow('rgba(20,12,8,.45)',22,3);
+    rich(line,W/2,base+(1-e)*lh*0.95,{color:opt.color,hl:opt.hl});ctx.restore();
+  });
+  return {bottom:top+lines.length*lh,size};
+}
+function badge(onMedia){fnt(700,24,SANS);const tw=ctx.measureText('새로운뷰티').width+36;ctx.fillStyle=onMedia?'rgba(255,248,238,.92)':C.wood;ctx.beginPath();ctx.roundRect(W/2-tw/2,92,tw,44,22);ctx.fill();ctx.fillStyle=onMedia?C.wood:C.ivory;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('새로운뷰티',W/2,115);ctx.textBaseline='alphabetic'}
+/* generic brand CTA */
+function ctaBasic(s,lt,th={}){
+  const has=coverFull(s.media,1);applyBlurs(s);
+  if(has){ctx.fillStyle=th.dim||'rgba(46,32,24,.74)';ctx.fillRect(0,0,W,H)}else{fill(th.bg||C.wood);ctx.fillStyle='rgba(156,175,136,.18)';ctx.beginPath();ctx.arc(W*.85,H*.15,240,0,7);ctx.fill()}
+  const lines=linesOf(s);const r=kinetic(lines.length?lines:['새로운뷰티'],H*.38,lt,{size:th.size||130,color:th.fg||C.ivory,hl:C.apricot,fam:th.fam,w:th.w,ital:th.ital});
+  if(s.sub)pill(s.sub,W/2,r.bottom+70,lt,0.35+lines.length*0.2,th.accent||C.apricot,th.accentFg||C.woodDeep,40);
+  fadeText(s.note,r.bottom+165,lt,0.75+lines.length*0.2,`500 28px ${SANS}`,th.noteC||C.cream);
+}
+
+/* ---------- 1 kinetic ---------- */
+function drawKinetic(s,i,lt){
+  if(s.kind==='cta')return ctaBasic(s,lt);
+  const has=coverFull(s.media,1);if(!has)placeholder();applyBlurs(s);
+  if(has){const g=ctx.createLinearGradient(0,0,0,H*.62);g.addColorStop(0,'rgba(30,20,14,.5)');g.addColorStop(1,'rgba(30,20,14,0)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H*.62)}
+  const r=kinetic(linesOf(s),H*.34,lt,{size:108,color:has?C.ivory:C.wood,hl:has?C.apricot:C.apricotDeep,shadow:has});
+  if(s.sub){const d=0.3+linesOf(s).length*0.2,p=clamp((lt-d)/0.4);if(p>0){const e=easeOut(p);ctx.save();ctx.globalAlpha=e;fnt(700,38,SANS);ctx.textAlign='center';
+    if(has)shadow('rgba(20,12,8,.5)',14);ctx.fillStyle=has?C.cream:C.wood;ctx.fillText(s.sub,W/2,r.bottom+56+(1-e)*18);ctx.restore()}}
+  if(showBadge)badge(has);
+}
+/* ---------- 2 cinematic ---------- */
+function grain(n=260,a=.05){ctx.fillStyle=`rgba(255,240,220,${a})`;for(let k=0;k<n;k++)ctx.fillRect(Math.random()*W,Math.random()*H,2,2)}
+function drawCinema(s,i,lt){
+  const d=s.dur,p=lt/d;fill('#120D0A');
+  const has=coverFull(s.media,1.04+0.08*p);applyBlurs(s);
+  if(has){ctx.fillStyle=s.kind==='cta'?'rgba(18,13,10,.7)':'rgba(18,13,10,.4)';ctx.fillRect(0,0,W,H);ctx.globalCompositeOperation='overlay';ctx.fillStyle='rgba(232,147,90,.24)';ctx.fillRect(0,0,W,H);ctx.globalCompositeOperation='source-over'}
+  else{const g=ctx.createRadialGradient(W*.5,H*.4,10,W*.5,H*.4,560);g.addColorStop(0,`rgba(232,147,90,${.14+.05*Math.sin(lt*2)})`);g.addColorStop(1,'rgba(232,147,90,0)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H)}
+  const sx=-500+p*(W+900);ctx.globalCompositeOperation='screen';const lg=ctx.createLinearGradient(sx,0,sx+360,360);lg.addColorStop(0,'rgba(255,214,170,0)');lg.addColorStop(.5,'rgba(255,214,170,.16)');lg.addColorStop(1,'rgba(255,214,170,0)');ctx.fillStyle=lg;ctx.fillRect(0,0,W,H);ctx.globalCompositeOperation='source-over';
+  const vg=ctx.createRadialGradient(W/2,H*.45,260,W/2,H*.45,900);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.72)');ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);
+  grain();
+  ctx.fillStyle='#0A0705';ctx.fillRect(0,0,W,128);ctx.fillRect(0,H-128,W,128);
+  fnt(700,20,SANS);ctx.fillStyle=C.apricot;ctx.textAlign='left';ctx.textBaseline='alphabetic';rich('새로운뷰티  ORIGINAL',W/2,76,{tr:5,color:C.apricot,hl:C.apricot});
+  const lines=linesOf(s);const cta=s.kind==='cta';
+  const base=cta?104:66,size=fitSize(lines,700,base,R_SERIF,W-120,false,8);fnt(700,size,R_SERIF);const lh=size*1.35,cy=H*(cta?.38:.36),top=cy-(lines.length-1)*lh/2;
+  shadow('rgba(0,0,0,.6)',30);
+  lines.forEach((l,k)=>{const q=clamp((lt-0.35-k*0.45)/1.2);if(q<=0)return;const e=easeOut(q);ctx.save();ctx.globalAlpha=e;fnt(700,size,R_SERIF);rich(l,W/2,top+k*lh+size*.35,{tr:16*(1-e)+(cta?6:2),color:C.ivory,hl:C.apricot});ctx.restore()});
+  noShadow();const by=top+(lines.length-1)*lh+size*.35;
+  if(s.sub){const q=clamp((lt-0.6-lines.length*0.45)/0.8);if(q>0){ctx.save();ctx.globalAlpha=q;fnt(500,cta?32:26,SANS);rich(s.sub,W/2,by+(cta?100:78),{tr:6,color:C.apricot,hl:C.apricot});
+    if(cta){fnt(500,32,SANS);const w=lineW(s.sub,6)+60;ctx.strokeStyle=C.apricot;ctx.lineWidth=2;ctx.strokeRect(W/2-w/2,by+52,w,66)}ctx.restore()}}
+  if(cta)fadeText(s.note,by+190,lt,1.4,`500 24px ${SANS}`,'rgba(246,239,227,.7)');
+  const fi=1-clamp(lt/0.5),fo=clamp((lt-(d-0.35))/0.35),fa=Math.max(fi,fo);if(fa>0){ctx.fillStyle=`rgba(0,0,0,${fa})`;ctx.fillRect(0,0,W,H)}
+}
+/* ---------- 3 vogue ---------- */
+function drawVogue(s,i,lt){
+  const p=lt/s.dur,cta=s.kind==='cta',L=i%2;fill(C.cream);
+  let box=cta?{x:64,y:620,w:592,h:500}:L?{x:150,y:300,w:570,h:760}:{x:64,y:280,w:592,h:800};
+  const rev=easeOut(clamp(lt/0.6));
+  ctx.save();ctx.beginPath();ctx.rect(box.x,box.y,box.w,box.h*rev);ctx.clip();
+  const has=drawCover(s.media,box.x,box.y,box.w,box.h,1.1,0,(0.5-p)*0.05);
+  if(!has){ctx.fillStyle='#E2D7C4';ctx.fillRect(box.x,box.y,box.w,box.h);ctx.fillStyle='rgba(156,175,136,.4)';ctx.beginPath();ctx.arc(box.x+box.w*.7,box.y+box.h*.7,180,0,7);ctx.fill()}
+  ctx.restore();applyBlurs(s);
+  if(!has)hint('＋ 사진·영상을 넣어주세요',box.y+box.h*.85,'rgba(74,52,38,.5)');
+  ctx.textBaseline='alphabetic';fnt(700,84,BODONI);rich('NEW BEAUTY',W/2,198,{tr:10,color:C.wood,hl:C.wood});
+  fnt(500,17,SANS);rich(`INCHEON  ·  No. ${String(i+1).padStart(2,'0')}  ·  ${YEAR}`,W/2,238,{tr:5,color:'rgba(74,52,38,.65)',hl:C.wood});
+  ctx.fillStyle='rgba(74,52,38,.65)';fnt(500,16,SANS);ctx.textAlign='right';ctx.fillText(`p. ${String(i*2+12)}`,W-60,H-150);
+  const lines=linesOf(s);
+  if(cta){const size=fitSize(lines,700,96,R_BODONI,W-120,true);
+    lines.forEach((l,k)=>{const q=easeOut(clamp((lt-0.3-k*0.18)/0.7));ctx.save();ctx.beginPath();ctx.rect(0,0,W*q,H);ctx.clip();fnt(700,size,R_BODONI,true);rich(l,W/2,372+k*size*1.05,{color:C.wood,hl:C.apricotDeep});ctx.restore()});
+    const yy=372+(lines.length-1)*size*1.05;if(s.sub)pill(s.sub,W/2,yy+80,lt,0.8,C.wood,C.wood,30,R_SERIF,true);
+    fadeText(s.note,yy+165,lt,1.1,fstr(500,22,R_SERIF),'rgba(74,52,38,.75)');return}
+  const size=fitSize(lines,700,104,R_BODONI,box.w-60,true),lh=size*1.02,ty=box.y+120;
+  const align=L?'right':'left',ax=L?box.x+box.w-32:box.x+32;
+  lines.forEach((l,k)=>{const q=easeOut(clamp((lt-0.35-k*0.18)/0.7));if(q<=0)return;ctx.save();ctx.beginPath();if(L)ctx.rect(W-W*q,0,W*q,H);else ctx.rect(0,0,W*q,H);ctx.clip();
+    if(has)shadow('rgba(20,12,8,.35)',18);fnt(700,size,R_BODONI,true);rich(l,ax,ty+k*lh+size*.8,{align,color:has?C.ivory:C.wood,hl:has?C.apricot:C.apricotDeep});ctx.restore()});
+  if(s.sub){const q=clamp((lt-0.75-lines.length*0.18)/0.5);if(q>0){ctx.save();ctx.globalAlpha=q;if(has)shadow('rgba(20,12,8,.5)',12);fnt(500,26,R_SERIF);rich(s.sub,ax,ty+(lines.length-1)*lh+size*.8+52,{align,color:has?C.cream:C.wood,hl:C.apricot});ctx.restore()}}
+}
+/* ---------- 4 nike ---------- */
+function drawNike(s,i,lt){
+  const bp=(lt%BEAT)/BEAT,punch=s.slow?1+0.06*(lt/s.dur):1+0.13*Math.pow(1-clamp(bp/0.45),2);
+  const lines=linesOf(s).map(l=>l.toUpperCase());const cta=s.kind==='cta';
+  let has=false;
+  if(cta){has=coverFull(s.media,punch);applyBlurs(s);ctx.fillStyle=has?'rgba(232,147,90,.86)':C.apricot;ctx.fillRect(0,0,W,H)}
+  else{fill(C.woodDeep);has=coverFull(s.media,punch);applyBlurs(s);
+    if(has){ctx.fillStyle='rgba(20,12,8,.3)';ctx.fillRect(0,0,W,H)}
+    else{ctx.save();ctx.strokeStyle='rgba(232,147,90,.18)';ctx.lineWidth=18;for(let k=-4;k<10;k++){const x=k*120+((lt*900)%120);ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x-500,H);ctx.stroke()}ctx.restore();hint('＋ 사진·영상을 넣어주세요',H*.72,'rgba(246,239,227,.5)')}
+    if(s.slow){ctx.save();fnt(700,22,MONO);ctx.fillStyle=C.apricot;ctx.textAlign='left';ctx.fillText('● SLOW MOTION',60,H*.12);ctx.restore()}}
+  const size=fitSize(lines,900,cta?150:200,R_ANTON,W-110,true),lh=size*1.02,cy=H*(cta?.38:.36),top=cy-(lines.length*lh)/2;
+  const pop=1+0.25*Math.pow(1-clamp(lt/0.14),2);
+  ctx.save();ctx.translate(W/2,cy);ctx.scale(pop*(s.slow?1:punch*0.97+0.03),pop*(s.slow?1:punch*0.97+0.03));ctx.transform(1,0,-0.18,1,0,0);ctx.textBaseline='alphabetic';
+  lines.forEach((l,k)=>{fnt(900,size,R_ANTON,true);rich(l,0,top-cy+k*lh+size*0.88,{color:cta?C.woodDeep:C.ivory,hl:cta?C.ivory:C.apricot,stroke:{c:cta?'rgba(46,32,24,.35)':C.apricot,w:4,dx:12,dy:10}})});
+  ctx.restore();
+  if(cta){const by=top+lines.length*lh;if(s.sub)pill(s.sub.toUpperCase(),W/2,by+70,lt,BEAT,C.woodDeep,C.ivory,40,R_ANTON);fadeText(s.note,by+160,lt,BEAT*2,`700 26px ${SANS}`,C.woodDeep)}
+  else if(s.sub){fnt(700,34,SANS);ctx.fillStyle=C.cream;ctx.textAlign='center';ctx.fillText(s.sub,W/2,top+lines.length*lh+50)}
+  if(lt<0.09){ctx.fillStyle=`rgba(255,248,238,${0.85*(1-lt/0.09)})`;ctx.fillRect(0,0,W,H)}
+}
+/* ---------- 5 POV ---------- */
+function wrap(line,maxW){line=line.replace(/\*([^*]+)\*/g,(m,g)=>g.split(' ').map(x=>`*${x}*`).join(' '));const out=[];let cur='';
+  for(const w of line.split(' ')){const test=cur?cur+' '+w:w;if(cur&&ctx.measureText(test.replace(/\*/g,'')).width>maxW){out.push(cur);cur=w}else cur=test}if(cur)out.push(cur);return out}
+function captionBoxes(text,y,lt,{size=40,typed=1e9,bg=C.ivory,fg=C.wood,hl=C.apricotDeep,maxW=560}){
+  fnt(700,size,SANS);const lines=text.split('\n').flatMap(l=>wrap(l.trim(),maxW)).filter(Boolean);const lh=size*1.42;let used=0;
+  lines.forEach((l,k)=>{const n=[...l.replace(/\*/g,'')].length;const lim=typed-used;used+=n;if(lim<=0)return;fnt(700,size,SANS);const w=lineW(l);const yy=y+k*lh;
+    ctx.fillStyle=bg;ctx.beginPath();ctx.roundRect(W/2-w/2-20,yy-size*.98,w+40,size*1.36,12);ctx.fill();
+    ctx.textBaseline='alphabetic';rich(l,W/2,yy,{color:fg,hl,limit:lim})});
+  return y+lines.length*lh;
+}
+function drawPOV(s,i,lt){
+  const cta=s.kind==='cta';const sh=Math.sin(lt*7.3)*4,sv=Math.cos(lt*5.1)*4;
+  const has=coverFull(s.media,1.05,sh/W,sv/H);if(!has)cta?fill(C.wood):placeholder();applyBlurs(s);
+  if(has&&cta){ctx.fillStyle='rgba(46,32,24,.6)';ctx.fillRect(0,0,W,H)}
+  const typed=i===0?Math.floor(lt*24):Math.floor(lt*60);
+  const yb=captionBoxes(s.main,H*.17,lt,{typed,size:cta?54:40});
+  const nm=[...s.main.replace(/\*/g,'')].length,done=i===0?nm/24:nm/60;
+  if(s.sub&&!cta&&lt>done+0.2)captionBoxes(s.sub,yb+30,lt,{size:32,bg:'rgba(46,32,24,.85)',fg:C.ivory,hl:C.apricot});
+  if(cta){if(s.sub)pill(s.sub,W/2,yb+70,lt,done+0.2,C.apricot,C.woodDeep,40);fadeText(s.note,yb+165,lt,done+0.5,`500 28px ${SANS}`,C.cream)}
+}
+/* ---------- 6 HUD ---------- */
+function drawHUD(s,i,lt){
+  const cta=s.kind==='cta';fill('#111A15');const has=coverFull(s.media,1.02);applyBlurs(s);
+  ctx.fillStyle=has?'rgba(12,20,16,.5)':'rgba(12,20,16,0)';ctx.fillRect(0,0,W,H);
+  if(!has&&!cta)hint('＋ 스캐너 사진·영상을 넣어주세요',H*.82,'rgba(156,175,136,.6)');
+  ctx.strokeStyle='rgba(156,175,136,.13)';ctx.lineWidth=1;ctx.beginPath();for(let x=0;x<=W;x+=60){ctx.moveTo(x,0);ctx.lineTo(x,H)}for(let y=0;y<=H;y+=60){ctx.moveTo(0,y);ctx.lineTo(W,y)}ctx.stroke();
+  const sy=((lt/1.8)%1)*H;const g=ctx.createLinearGradient(0,sy-140,0,sy);g.addColorStop(0,'rgba(156,175,136,0)');g.addColorStop(1,'rgba(156,175,136,.32)');ctx.fillStyle=g;ctx.fillRect(0,sy-140,W,140);ctx.fillStyle=C.sage;ctx.fillRect(0,sy-2,W,3);
+  const e=easeOut(clamp(lt/0.5)),L=50*e;ctx.strokeStyle=C.sage;ctx.lineWidth=4;ctx.beginPath();
+  [[70,220,1,1],[650,220,-1,1],[70,1060,1,-1],[650,1060,-1,-1]].forEach(([x,y,dx,dy])=>{ctx.moveTo(x,y+dy*L);ctx.lineTo(x,y);ctx.lineTo(x+dx*L,y)});ctx.stroke();
+  fnt(700,20,MONO);ctx.textAlign='left';ctx.fillStyle=C.sage;ctx.fillText('BODY RESET 3D · SCAN MODE',70,180);
+  if(lt%1<.6){ctx.fillStyle=C.apricot;ctx.beginPath();ctx.arc(612,173,7,0,7);ctx.fill()}ctx.fillStyle=C.apricot;ctx.fillText('REC',622,180);
+  fnt(500,20,MONO);ctx.fillStyle='rgba(156,175,136,.8)';ctx.fillText(`T+${(startOf(i)+lt).toFixed(2).padStart(5,'0')}s`,70,1100);
+  const lines=linesOf(s);
+  if(cta){const gl=lt<0.45;fnt(900,104,SANS);const r=kinetic(lines.length?lines:['새로운뷰티'],H*.38,lt,{size:110,color:C.ivory,hl:C.apricot});
+    if(gl){ctx.save();ctx.globalAlpha=.5;ctx.globalCompositeOperation='screen';ctx.fillStyle=C.sage;ctx.fillRect(0,H*.38-60+Math.random()*40,W,6);ctx.restore()}
+    if(s.sub)pill(s.sub,W/2,r.bottom+70,lt,0.6,C.sage,C.sage,34,MONO,true);fadeText(s.note,r.bottom+160,lt,0.9,`500 24px ${MONO}`,'rgba(156,175,136,.9)');return}
+  const step=150,y0=Math.max(320,H*.32-(lines.length-1)*step/2);
+  lines.forEach((l,k)=>{const t0=0.3+k*0.7,q=clamp((lt-t0)/0.5),q2=clamp((lt-t0)/0.9);if(q<=0)return;const y=y0+k*step,ee=easeOut(q);
+    fnt(700,20,MONO);ctx.textAlign='left';ctx.fillStyle=C.sage;ctx.fillText(`[0${k+1}] ${q2>=1?'DONE ✓':'ANALYZING'}`,90,y-62);
+    ctx.save();ctx.globalAlpha=ee;const size=fitSize([l],900,60,SANS,540);fnt(900,size,SANS);shadow('rgba(0,0,0,.5)',12);rich(l,90+(1-ee)*40,y,{align:'left',color:C.ivory,hl:C.apricot});ctx.restore();
+    ctx.fillStyle='rgba(156,175,136,.25)';ctx.fillRect(90,y+22,540,6);ctx.fillStyle=C.sage;ctx.fillRect(90,y+22,540*q2,6)});
+  if(s.sub){const t0=0.4+lines.length*0.7,n=Math.floor(clamp(lt-t0,0,9)*24);if(n>0){fnt(700,26,MONO);ctx.textAlign='left';ctx.fillStyle=C.apricot;ctx.fillText('> '+[...s.sub].slice(0,n).join(''),90,y0+(lines.length-1)*step+100)}}
+}
+/* ---------- 7 split ---------- */
+function drawSplit(s,i,lt){
+  if(s.kind==='cta')return ctaBasic(s,lt);
+  fill(C.cream);const e=easeOut(clamp(lt/0.45));
+  ctx.save();ctx.translate(-(1-e)*W,0);if(!drawCover(s.media,0,0,W,H/2,1.03)){ctx.fillStyle='#E3E9DA';ctx.fillRect(0,0,W,H/2);hint('＋ 위 화면 사진·영상',H*.4,'rgba(74,52,38,.5)')}ctx.restore();
+  ctx.save();ctx.translate((1-e)*W,0);if(!drawCover(s.media2,0,H/2,W,H/2,1.03)){ctx.fillStyle='#F2DCCB';ctx.fillRect(0,H/2,W,H/2);hint('＋ 아래 화면 사진·영상',H*.9,'rgba(74,52,38,.5)')}ctx.restore();
+  applyBlurs(s);
+  ctx.fillStyle=C.ivory;ctx.fillRect(0,H/2-4,W,8);
+  const v=easeBack(clamp((lt-.3)/.35));if(v>0){ctx.fillStyle=C.apricot;ctx.beginPath();ctx.arc(W/2,H/2,58*v,0,7);ctx.fill();ctx.fillStyle=C.woodDeep;fnt(900,40*v,ANTON);ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('VS',W/2,H/2+2);ctx.textBaseline='alphabetic'}
+  const [a,b]=linesOf(s);
+  const tag=(txt,y,d)=>{const q=clamp((lt-d)/0.35);if(q<=0||!txt)return;const ee=easeBack(q);fnt(900,44,SANS);const w=lineW(txt)+52;ctx.save();ctx.translate(W/2,y);ctx.scale(.8+.2*ee,.8+.2*ee);ctx.globalAlpha=clamp(q*2);
+    ctx.fillStyle=C.wood;ctx.beginPath();ctx.roundRect(-w/2,-42,w,80,40);ctx.fill();rich(txt,0,15,{color:C.ivory,hl:C.apricot});ctx.restore()};
+  tag(a,H*.14,.35);tag(b,H*.62,.6);
+  if(s.sub){const q=clamp((lt-.9)/.4);if(q>0){ctx.save();ctx.globalAlpha=q;shadow('rgba(20,12,8,.6)',14);fnt(700,32,SANS);ctx.fillStyle=C.ivory;ctx.textAlign='center';ctx.fillText(s.sub,W/2,H*.62+90);ctx.restore()}}
+  if(showBadge)badge(true);
+}
+/* ---------- 8 vlog ---------- */
+function drawVlog(s,i,lt){
+  const cta=s.kind==='cta';const has=coverFull(s.media,1.02+0.03*lt/s.dur);if(!has)cta?fill(C.cream):placeholder();applyBlurs(s);
+  if(has){ctx.globalCompositeOperation='overlay';ctx.fillStyle='rgba(232,147,90,.16)';ctx.fillRect(0,0,W,H);ctx.globalCompositeOperation='source-over';
+    const vg=ctx.createRadialGradient(W/2,H/2,300,W/2,H/2,820);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(30,20,14,.45)');ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);
+    const tg=ctx.createLinearGradient(0,0,0,H*.55);tg.addColorStop(0,'rgba(30,20,14,.35)');tg.addColorStop(1,'rgba(30,20,14,0)');ctx.fillStyle=tg;ctx.fillRect(0,0,W,H*.55);grain(160,.04)}
+  if(cta&&has){ctx.fillStyle='rgba(246,239,227,.82)';ctx.fillRect(0,0,W,H)}
+  const light=has&&!cta,fg=light?C.ivory:C.wood;
+  fnt(700,24,MONO);ctx.textAlign='left';if(lt%1<.6){ctx.fillStyle=C.apricot;ctx.beginPath();ctx.arc(76,112,9,0,7);ctx.fill()}ctx.fillStyle=fg;ctx.fillText('REC',94,120);
+  const mins=9*60+i*7+Math.floor(lt);ctx.textAlign='right';ctx.fillText(`AM ${String(Math.floor(mins/60)).padStart(2,'0')}:${String(mins%60).padStart(2,'0')}`,W-70,120);
+  const lines=linesOf(s);const size=fitSize(lines,700,cta?96:64,R_HAND,W-140),lh=size*1.12,y0=H*(cta?.33:.25);
+  lines.forEach((l,k)=>{const q=clamp((lt-0.15-k*0.3)/0.35);if(q<=0)return;const ee=easeOut(q);ctx.save();ctx.globalAlpha=ee;if(light)shadow('rgba(20,12,8,.55)',12);fnt(700,size,R_HAND);
+    const y=y0+k*lh+(1-ee)*14,x=cta?W/2:70;rich(l,x,y,{align:cta?'center':'left',color:fg,hl:C.apricot});
+    const segs=parseSegs(l);if(segs.some(g=>g.hl)){let cx=cta?x-lineW(l)/2:x;noShadow();for(const g of segs){const w=ctx.measureText(g.t).width;if(g.hl){ctx.strokeStyle=C.apricot;ctx.lineWidth=5;ctx.lineCap='round';ctx.beginPath();for(let u=0;u<=w*ee;u+=6)ctx.lineTo(cx+u,y+14+Math.sin(u/9)*3);ctx.stroke()}cx+=w}}
+    ctx.restore()});
+  const yb=y0+(lines.length-1)*lh;
+  if(cta){if(s.sub)pill(s.sub,W/2,yb+90,lt,0.5+lines.length*0.3,C.wood,C.ivory,36,R_HAND);fadeText(s.note,yb+180,lt,0.9,fstr(700,30,R_HAND),C.wood)}
+  else if(s.sub){const q=clamp((lt-0.35-lines.length*0.3)/0.4);if(q>0){ctx.save();ctx.globalAlpha=q;if(light)shadow('rgba(20,12,8,.55)',10);fnt(700,40,R_HAND);ctx.textAlign='left';ctx.fillStyle=light?C.cream:C.wood;ctx.fillText('- '+s.sub,74,yb+70);ctx.restore()}}
+}
+/* ---------- 9 stop motion ---------- */
+const SM_BG=[C.sage,C.apricot,C.cream,'#E6D3BC'];
+function drawStop(s,i,lt){
+  const step=Math.floor(lt*8),rnd=k=>{const x=Math.sin((i*97+step*13+k)*12.9898)*43758.5453;return x-Math.floor(x)};
+  const cta=s.kind==='cta',bgc=cta?C.wood:SM_BG[i%4],prev=i>0?(scenes[i-1].kind==='cta'?C.wood:SM_BG[(i-1)%4]):bgc;
+  if(step<3&&i>0){fill(prev);ctx.fillStyle=bgc;ctx.beginPath();ctx.arc(W/2,H*.58,[160,520,1400][step],0,7);ctx.fill()}else fill(bgc);
+  const sc=[0.55,1.1,0.97,1][Math.min(step,3)],rot=(rnd(1)-.5)*0.07,dx=(rnd(2)-.5)*12,dy=(rnd(3)-.5)*10;
+  const cw=cta?440:520,ch=cta?540:700,cy=H*(cta?.68:.6);
+  ctx.save();ctx.translate(W/2+dx,cy+dy);ctx.rotate(rot);ctx.scale(sc,sc);shadow('rgba(40,26,16,.32)',30,16);
+  ctx.fillStyle=C.ivory;ctx.beginPath();ctx.roundRect(-cw/2-16,-ch/2-16,cw+32,ch+32,18);ctx.fill();noShadow();
+  const has=drawCover(s.media,-cw/2,-ch/2,cw,ch,1);if(!has){ctx.fillStyle='#EDE3D3';ctx.fillRect(-cw/2,-ch/2,cw,ch);if(!exporting){ctx.fillStyle='rgba(74,52,38,.5)';fnt(700,26,SANS);ctx.textAlign='center';ctx.fillText('＋ 사진·영상',0,0)}}
+  ctx.restore();applyBlurs(s);
+  const dark=bgc===C.wood,fg=dark?C.ivory:C.woodDeep,hl=dark?C.apricot:(bgc===C.apricot?C.ivory:C.apricotDeep);
+  const lines=linesOf(s),size=fitSize(lines,900,cta?100:84,SANS,W-100),lh=size*1.15,y0=H*(cta?.2:.17);let shown=step*2;
+  lines.forEach((l,k)=>{fnt(900,size,SANS);const w=lineW(l);let x=W/2-w/2;
+    for(const g of parseSegs(l))for(const chh of g.t){if(shown--<=0)return;const cwid=ctx.measureText(chh).width;ctx.save();ctx.translate(x+cwid/2,y0+k*lh);ctx.rotate((Math.sin((k*31+x)*1.7+step*.0)*.06));ctx.fillStyle=g.hl?hl:fg;ctx.textAlign='center';ctx.fillText(chh,0,0);ctx.restore();x+=cwid}});
+  const yb=y0+(lines.length-1)*lh;
+  if(s.sub){if(cta)pill(s.sub,W/2,yb+78,lt,0.6,C.apricot,C.woodDeep,36);else if(shown>0){fnt(700,32,SANS);ctx.fillStyle=fg;ctx.textAlign='center';ctx.fillText(s.sub,W/2,yb+62)}}
+}
+/* ---------- 10 mood b-roll ---------- */
+function drawBroll(s,i,lt){
+  if(s.kind==='cta')return ctaBasic(s,lt,{fam:R_SERIF,w:700,size:112});
+  const g=(s._off||0)+lt;const has=coverFull(s.media,1.03+0.012*g);if(!has)placeholder();applyBlurs(s);
+  if(has){ctx.globalCompositeOperation='overlay';ctx.fillStyle='rgba(232,147,90,.12)';ctx.fillRect(0,0,W,H);ctx.globalCompositeOperation='source-over';
+    const tg=ctx.createLinearGradient(0,0,0,H*.65);tg.addColorStop(0,'rgba(30,20,14,.55)');tg.addColorStop(1,'rgba(30,20,14,0)');ctx.fillStyle=tg;ctx.fillRect(0,0,W,H*.65);
+    const vg=ctx.createRadialGradient(W/2,H/2,320,W/2,H/2,860);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(30,20,14,.5)');ctx.fillStyle=vg;ctx.fillRect(0,0,W,H)}
+  const lines=linesOf(s),size=fitSize(lines,900,78,SANS,W-120),lh=size*1.3,top=H*.36-(lines.length*lh)/2;
+  const out=1-clamp((lt-(s.dur-.35))/.35),fg=has?C.ivory:C.wood;
+  const ln=easeOut(clamp(lt/0.6));ctx.fillStyle=C.sage;ctx.fillRect(W/2-36*ln,top-30,72*ln,4);
+  lines.forEach((l,k)=>{const q=clamp((lt-0.2-k*0.3)/0.9);if(q<=0)return;const e=easeOut(q);ctx.save();ctx.globalAlpha=e*out;if(has)shadow('rgba(20,12,8,.55)',24,2);fnt(900,size,SANS);
+    rich(l,W/2,top+k*lh+size*.95+(1-e)*18,{color:fg,hl:C.apricot});ctx.restore()});
+  if(s.sub){const q=clamp((lt-0.5-lines.length*0.3)/0.6);if(q>0){ctx.save();ctx.globalAlpha=q*out;if(has)shadow('rgba(20,12,8,.5)',12);fnt(500,30,SANS);ctx.fillStyle=has?C.cream:C.wood;ctx.textAlign='center';ctx.fillText(s.sub,W/2,top+lines.length*lh+40);ctx.restore()}}
+}
+/* ---------- 11 loading ---------- */
+function pctOf(i){const s=scenes[i];const m=s.main.match(/(\d{1,3})\s*%/);if(m)return clamp(+m[1],0,100);const body=scenes.filter(x=>x.kind!=='cta');const k=body.indexOf(s);return Math.round(k/Math.max(1,body.length-1)*100)}
+function drawLoading(s,i,lt){
+  if(s.kind==='cta')return ctaBasic(s,lt);
+  const has=coverFull(s.media,1.03+0.02*lt/s.dur);if(!has)placeholder('＋ 사진·영상을 넣어주세요',H*.82);applyBlurs(s);
+  if(has){const tg=ctx.createLinearGradient(0,0,0,H*.6);tg.addColorStop(0,'rgba(30,20,14,.45)');tg.addColorStop(1,'rgba(30,20,14,0)');ctx.fillStyle=tg;ctx.fillRect(0,0,W,H*.6)}
+  const prev=i>0&&scenes[i-1].kind!=='cta'?pctOf(i-1):0,target=pctOf(i);
+  const q=easeOut(clamp((lt-0.15)/Math.min(1.2,s.dur*.6))),val=Math.round(prev+(target-prev)*q),done=val>=100;
+  const label=s.main.replace(/\d{1,3}\s*%/,'').replace(/\n/g,' ').replace(/\s+/g,' ').trim();
+  const e=easeOut(clamp(lt/0.35));ctx.save();ctx.globalAlpha=e;ctx.translate(0,(1-e)*-24);
+  const x=60,y=190,w=W-120,h=330;shadow('rgba(30,20,14,.25)',30,10);ctx.fillStyle=C.ivory;ctx.beginPath();ctx.roundRect(x,y,w,h,28);ctx.fill();noShadow();
+  fnt(700,20,MONO);ctx.textAlign='left';ctx.fillStyle='rgba(74,52,38,.7)';ctx.fillText(done?'COMPLETE':'LOADING'+'.'.repeat(1+Math.floor(lt*3)%3),x+36,y+52);
+  ctx.textAlign='right';fnt(700,20,SANS);ctx.fillStyle=C.sage;ctx.fillText('새로운뷰티',x+w-36,y+52);
+  fnt(400,168,ANTON);ctx.textAlign='left';ctx.fillStyle=done?C.sage:C.apricotDeep;ctx.fillText(`${val}%`,x+30,y+222);
+  if(done){const d=easeBack(clamp((lt-1.2)/.35));if(d>0){ctx.save();ctx.translate(x+w-110,y+165);ctx.scale(d,d);ctx.fillStyle=C.sage;ctx.beginPath();ctx.arc(0,0,48,0,7);ctx.fill();ctx.strokeStyle=C.ivory;ctx.lineWidth=9;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-20,2);ctx.lineTo(-5,17);ctx.lineTo(22,-14);ctx.stroke();ctx.restore()}}
+  const ls=fitSize([label],900,40,SANS,w-72);fnt(900,ls,SANS);rich(label,x+36,y+272,{align:'left',color:C.wood,hl:C.apricotDeep});
+  ctx.fillStyle='rgba(74,52,38,.12)';ctx.beginPath();ctx.roundRect(x+36,y+292,w-72,14,7);ctx.fill();
+  ctx.fillStyle=done?C.sage:C.apricot;ctx.beginPath();ctx.roundRect(x+36,y+292,Math.max(14,(w-72)*val/100),14,7);ctx.fill();
+  ctx.restore();
+  if(s.sub){const p=clamp((lt-0.8)/0.4);if(p>0){ctx.save();ctx.globalAlpha=p;if(has)shadow('rgba(20,12,8,.55)',12);fnt(700,32,SANS);ctx.fillStyle=has?C.ivory:C.wood;ctx.textAlign='center';ctx.fillText(s.sub,W/2,590);ctx.restore()}}
+}
+/* ---------- 12 freeze frame ---------- */
+function drawFreeze(s,i,lt){
+  if(s.kind==='cta')return ctaBasic(s,lt);
+  const fzT=s.fz*s.dur,frozen=lt>=fzT,ft=lt-fzT;
+  const z=frozen?1.06+0.04*easeOut(clamp(ft/0.25)):1.02+0.04*(lt/Math.max(.1,fzT));
+  const has=coverFull(s.media,z);if(!has)placeholder();applyBlurs(s);
+  if(!frozen)return;
+  ctx.globalCompositeOperation='saturation';ctx.fillStyle='rgba(128,128,128,.65)';ctx.fillRect(0,0,W,H);
+  ctx.globalCompositeOperation='soft-light';ctx.fillStyle='rgba(246,239,227,.35)';ctx.fillRect(0,0,W,H);ctx.globalCompositeOperation='source-over';
+  ctx.fillStyle='rgba(46,32,24,.28)';ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle=C.ivory;ctx.lineWidth=8;ctx.strokeRect(28,28,W-56,H-56);
+  fnt(700,22,MONO);const tw=ctx.measureText('❚❚ PAUSE').width+36;ctx.fillStyle=C.apricot;ctx.beginPath();ctx.roundRect(60,92,tw,46,23);ctx.fill();ctx.fillStyle=C.woodDeep;ctx.textAlign='left';ctx.fillText('❚❚ PAUSE',78,123);
+  const lines=linesOf(s),d=easeBack(clamp((ft-0.12)/0.35));
+  if(d>0&&lines.length){const size=fitSize(lines,900,112,SANS,W-170),lh=size*1.12;fnt(900,size,SANS);const bw=Math.max(...lines.map(l=>lineW(l)))+70,bh=lines.length*lh+40;
+    ctx.save();ctx.translate(W/2,H*.3);ctx.rotate(-0.05);ctx.scale(d,d);shadow('rgba(20,12,8,.4)',24,8);ctx.fillStyle=C.apricot;ctx.beginPath();ctx.roundRect(-bw/2,-bh/2,bw,bh,22);ctx.fill();noShadow();
+    lines.forEach((l,k)=>{fnt(900,size,SANS);rich(l,0,-bh/2+20+k*lh+size*.9,{color:C.woodDeep,hl:C.ivory})});ctx.restore()}
+  if(s.sub){const p=easeBack(clamp((ft-0.45)/0.35));if(p>0){fnt(700,34,SANS);const sl=wrap(s.sub,520),w2=Math.max(...sl.map(l=>lineW(l)))+56,h2=sl.length*48+34;
+    ctx.save();ctx.translate(W/2,H*.3+(lines.length*60)+120);ctx.rotate(0.025);ctx.scale(p,p);ctx.fillStyle=C.ivory;ctx.beginPath();ctx.roundRect(-w2/2,-h2/2,w2,h2,16);ctx.fill();
+    sl.forEach((l,k)=>{fnt(700,34,SANS);rich(l,0,-h2/2+17+k*48+36,{color:C.wood,hl:C.apricotDeep})});ctx.restore()}}
+  if(ft<0.12){ctx.fillStyle=`rgba(255,248,238,${0.9*(1-ft/0.12)})`;ctx.fillRect(0,0,W,H)}
+}
+const DRAW={kinetic:drawKinetic,cinema:drawCinema,vogue:drawVogue,nike:drawNike,pov:drawPOV,hud:drawHUD,split:drawSplit,vlog:drawVlog,stop:drawStop,broll:drawBroll,loading:drawLoading,freeze:drawFreeze};
+
+/* media carried over from an earlier scene (B-roll, freeze) */
+function resolved(i){const s=scenes[i];if(s.media||!S().carry||s.kind==='cta')return{m:s.media,off:0,owner:i};
+  for(let k=i-1;k>=0;k--){if(scenes[k].kind==='cta')break;if(scenes[k].media)return{m:scenes[k].media,off:startOf(i)-startOf(k),owner:k}}return{m:null,off:0,owner:i}}
+function drawScene(i,lt){
+  const s=scenes[i];if(!s)return;const r=resolved(i);const v={...s,media:r.m,_off:r.off};
+  ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';noShadow();ctx.textBaseline='alphabetic';
+  ctx.save();try{DRAW[style](v,i,lt)}catch(e){console.error(e)}ctx.restore();
+  ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=1;noShadow();
+  if(!exporting&&i===sel){s.blurs.forEach((b,k)=>{const rx=b.r*W;ctx.save();ctx.strokeStyle=k===selBlur?C.apricot:'rgba(255,255,255,.85)';ctx.lineWidth=4;ctx.setLineDash([12,8]);ctx.beginPath();ctx.ellipse(b.x*W,b.y*H,rx,rx*1.25,0,0,7);ctx.stroke();ctx.restore()})}
+}
+
+/* ---------- video sync ---------- */
+function vids(s){return [s.media,s.media2].filter(m=>m&&m.type==='video').map(m=>m.el)}
+const vTime=(s,lt)=>S().freeze?Math.min(lt,s.fz*s.dur):lt;
+const isFrozen=(s,lt)=>!!S().freeze&&s.kind!=='cta'&&lt>=s.fz*s.dur;
+function syncVideos(force){
+  const {i,lt}=sceneAt(t);const s=scenes[i],r=resolved(i),rr=rate(s),changed=i!==curScene;
+  const list=[];if(r.m&&r.m.type==='video')list.push([r.m.el,(r.off+vTime(s,lt))*rr,r.owner===i]);
+  if(s.media2&&s.media2.type==='video')list.push([s.media2.el,vTime(s,lt)*rr,true]);
+  const act=new Set(list.map(x=>x[0]));
+  scenes.forEach(x=>vids(x).forEach(v=>{if(!act.has(v)&&!v.paused)v.pause()}));
+  list.forEach(([v,target,own])=>{try{v.playbackRate=rr}catch(e){}const tg=v.duration?target%v.duration:target;
+    if(playing){
+      if(isFrozen(s,lt)){if(!v.paused)v.pause();if(force||changed){try{v.currentTime=tg}catch(e){}}}
+      else if(force||(changed&&(own||v.paused))){try{v.currentTime=tg}catch(e){}v.play().catch(()=>{})}
+      else if(v.paused)v.play().catch(()=>{});
+    }else{if(!v.paused)v.pause();if(force||Math.abs(v.currentTime-tg)>0.2){try{v.currentTime=tg}catch(e){}}}
+  });
+  curScene=i;
+}
+function freezeTick(cur){const s=scenes[cur.i];if(!isFrozen(s,cur.lt))return;const r=resolved(cur.i);[r.m,s.media2].forEach(m=>{if(m&&m.type==='video'&&!m.el.paused)m.el.pause()})}
+
+/* ---------- loop ---------- */
+const scrub=document.getElementById('scrub'),timeEl=document.getElementById('time'),playBtn=document.getElementById('playBtn');
+function frame(now){
+  if(playing){t+=(now-last)/1000;
+    if(t>=total()){if(exporting){t=total()-0.001;finishExport()}else{t=0;curScene=-1}}
+  }
+  last=now;
+  const cur=sceneAt(t);if(cur.i!==curScene)syncVideos(false);
+  if(playing&&S().freeze)freezeTick(cur);
+  const fps=S().fps,key=fps?cur.i+':'+Math.floor(cur.lt*fps):'';
+  if(!(fps&&playing&&key===lastKey&&!drag)){ctx.clearRect(0,0,W,H);drawScene(cur.i,cur.lt);lastKey=key}
+  scrub.value=t;timeEl.textContent=`${t.toFixed(1)} / ${total().toFixed(1)}s`;
+  if(exporting)fill_.style.width=(t/total()*100)+'%';
+  requestAnimationFrame(frame);
+}
+function setPlaying(p){playing=p;lastKey='';playBtn.textContent=p?'❚❚':'▶';playBtn.setAttribute('aria-label',p?'일시정지':'재생');syncVideos(true)}
+playBtn.onclick=()=>{if(exporting)return;if(!playing&&t>=total()-0.05)t=0;setPlaying(!playing)};
+scrub.oninput=()=>{if(exporting)return;t=+scrub.value;if(playing)setPlaying(false);syncVideos(true);const c=sceneAt(t);if(c.i!==sel){sel=c.i;selBlur=-1;renderUI()}};
+
+/* ---------- fonts ---------- */
+const FONT_SPECS=[`900 80px "Noto Sans KR"`,`700 40px "Noto Sans KR"`,`500 30px "Noto Sans KR"`,`700 60px "Noto Serif KR"`,`500 30px "Noto Serif KR"`,`italic 700 80px "Bodoni Moda"`,`700 80px "Bodoni Moda"`,`80px "Anton"`,`700 24px "IBM Plex Mono"`,`500 24px "IBM Plex Mono"`,`700 60px "Gaegu"`];
+let fontTimer=0;
+function loadFonts(){const txt=scenes.map(s=>s.main+s.sub+s.note).join('')+'새로운뷰티 ORIGINAL NEW BEAUTY INCHEON No. REC AM SCAN MODE ANALYZING DONE VS SLOW MOTION 0123456789:+-·>＋ 사진영상을넣어주세요위아래화면';
+  if(!document.fonts)return Promise.resolve();return Promise.all(FONT_SPECS.map(f=>document.fonts.load(f,txt).catch(()=>{})))}
+const queueFonts=()=>{clearTimeout(fontTimer);fontTimer=setTimeout(loadFonts,400)};
+
+/* ---------- UI ---------- */
+const strip=document.getElementById('strip'),panel=document.getElementById('panel'),totalEl=document.getElementById('total');
+const styleSel=document.getElementById('styleSel'),fontSeg=document.getElementById('fontSeg'),styDetail=document.getElementById('styDetail'),specEl=document.getElementById('spec');
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pristine=()=>{const p=S().preset;return scenes.length===p.length&&scenes.every((s,k)=>s.main===p[k].main&&(s.sub||'')===(p[k].sub||''))};
+function loadPreset(id){
+  const pre=ST[id].preset,old=scenes.slice(),md=old.filter(s=>s.kind!=='cta'),ctaOld=old.find(s=>s.kind==='cta');
+  const next=pre.map(p=>{const sc=mk(p);const src=p.kind==='cta'?ctaOld:md.shift();if(src){sc.media=src.media;sc.media2=src.media2;sc.mKey=src.mKey;sc.m2Key=src.m2Key;sc.blurs=src.blurs}return sc});
+  md.filter(s=>s.media).forEach(s=>{const sc=mk({main:'',dur:ST[id].bpm?BEAT*2:1.5});sc.media=s.media;sc.media2=s.media2;sc.mKey=s.mKey;sc.m2Key=s.m2Key;sc.blurs=s.blurs;const ci=next.findIndex(x=>x.kind==='cta');next.splice(ci<0?next.length:ci,0,sc)});
+  scenes=next;
+}
+let presetConfirm=false;
+styleSel.onchange=()=>{const id=styleSel.value;if(!ST[id]||id===style)return;const wasPristine=pristine();style=id;presetConfirm=false;if(wasPristine)loadPreset(id);save();queueFonts();renderStyles();selectScene(0)};
+function renderStyles(){
+  styleSel.innerHTML=ORDER.map(id=>{const st=ST[id];return `<option value="${id}"${id===style?' selected':''}>${st.no}. ${esc(st.name)}</option>`}).join('');
+  fontSeg.querySelectorAll('button').forEach(b=>{b.classList.toggle('on',b.dataset.f===fontMode);b.setAttribute('aria-pressed',b.dataset.f===fontMode)});
+  const st=S();specEl.textContent=`9:16 · ${st.name}`;
+  styDetail.innerHTML=`<h2>${esc(st.name)}<small>${esc(st.en)}</small></h2><p>${esc(st.desc)}</p><div class="ex">예시: ${esc(st.ex)}</div>
+    <div class="meta"><span>추천 ${esc(st.rec)}</span>${st.split?'<span>장면마다 사진 2개</span>':''}${st.bpm?'<span>128BPM 박자</span>':''}</div>
+    ${pristine()?'':`<div class="row"><button class="btn sm" id="loadPre">${presetConfirm?'한 번 더 누르면 지금 문구가 예시로 바뀌어요':'이 스타일 예시 문구·길이 불러오기'}</button></div>`}`;
+  const lp=styDetail.querySelector('#loadPre');lp&&(lp.onclick=()=>{if(!presetConfirm){presetConfirm=true;renderStyles();return}presetConfirm=false;loadPreset(style);save();queueFonts();renderStyles();selectScene(0)});
+}
+function renderStrip(){
+  strip.innerHTML='';
+  scenes.forEach((s,i)=>{const b=document.createElement('button');b.className='chip'+(i===sel?' on':'');b.setAttribute('aria-label',`장면 ${i+1}`);
+    let bg='<div class="ph"></div>';if(s.media&&s.media.type==='image')bg=`<img src="${s.media.url}" alt="">`;
+    const cap=esc((s.main||'').replace(/\*/g,'').split('\n')[0]||'(문구 없음)');
+    b.innerHTML=`${bg}<span class="n">${i+1}</span><span class="tag">${s.kind==='cta'?'CTA':s.media?(s.media.type==='video'?'영상':'사진'):s.dur.toFixed(1)+'s'}</span><span class="cap">${cap}</span>`;
+    b.onclick=()=>{selectScene(i)};strip.appendChild(b)});
+  if(scenes.length<10){const a=document.createElement('button');a.className='chip add';a.textContent='＋ 장면';a.onclick=()=>{const idx=scenes.findIndex(s=>s.kind==='cta');const at=idx<0?scenes.length:idx;scenes.splice(at,0,mk({main:'새 문구',dur:S().bpm?BEAT*2:2.5}));save();selectScene(at)};strip.appendChild(a)}
+  const tt=total(),tg=S().len;totalEl.textContent=`총 ${tt.toFixed(1)}초 · 추천 ${tg}초`;totalEl.className='total'+(Math.abs(tt-tg)>0.6?' off':'');
+}
+function selectScene(i){sel=Math.max(0,Math.min(i,scenes.length-1));selBlur=-1;if(playing)setPlaying(false);const s=scenes[sel];
+  t=startOf(sel)+Math.min(s.dur-0.05,S().freeze&&s.kind!=='cta'?s.fz*s.dur+1.0:1.6);syncVideos(true);renderUI()}
+const LABELS={broll:['자막','잔잔하게 떠오르는 큰 자막이에요.'],loading:['단계 문구','숫자와 %를 함께 쓰면 그 숫자까지 올라가요. 예) 타월 세팅 30%'],freeze:['멈춘 순간 문구','영상이 멈출 때 스티커처럼 붙어요. 아래 작은 문구가 설명이 돼요.'],split:['위 / 아래 라벨','첫 줄은 위 화면, 둘째 줄은 아래 화면 라벨이에요.'],hud:['스캔 항목','한 줄에 하나씩, 차례로 분석되듯 나타나요.'],pov:['캡션','타자 치듯 나와요. 첫 장면은 "POV:"로 시작하면 좋아요.'],vogue:['화보 타이틀','영어 대문자로 쓰면 화보 느낌이 살아요.']};
+function renderPanel(){
+  const s=scenes[sel];if(!s){panel.innerHTML='';return}
+  const cta=s.kind==='cta',st=S(),lab=LABELS[style],step=st.bpm?BEAT:0.5;
+  const hasVid=[s.media,s.media2].some(m=>m&&m.type==='video');
+  panel.innerHTML=`
+  <div class="label"><span>장면 ${sel+1}${cta?' · 마지막 문의 화면':''}</span>
+    <span class="row"><button class="btn sm" id="mL" ${sel===0?'disabled':''} aria-label="앞으로">◀</button><button class="btn sm" id="mR" ${sel===scenes.length-1?'disabled':''} aria-label="뒤로">▶</button><button class="btn sm danger" id="del" ${scenes.length<=1?'disabled':''}>삭제</button></span></div>
+  <div class="row"><label class="btn accent filebtn">${st.split&&!cta?(s.media?'위 화면 바꾸기':'＋ 위 화면 사진·영상'):(s.media?'사진·영상 바꾸기':'＋ 사진·영상 넣기')}<input type="file" accept="image/*,video/*" data-slot="media" aria-label="사진·영상 선택"></label>
+    ${s.media?`<button class="btn sm" id="rm">빼기</button><span class="media-name">${esc(s.media.name)}</span>`:''}</div>
+  ${st.split&&!cta?`<div class="row"><label class="btn accent filebtn">${s.media2?'아래 화면 바꾸기':'＋ 아래 화면 사진·영상'}<input type="file" accept="image/*,video/*" data-slot="media2" aria-label="아래 화면 사진·영상 선택"></label>${s.media2?`<button class="btn sm" id="rm2">빼기</button><span class="media-name">${esc(s.media2.name)}</span>`:''}</div>`:''}
+  <div class="field"><label for="f-main">${cta?'큰 글자 (샵 이름)':lab?lab[0]:'큰 문구'}</label>
+    <textarea id="f-main" rows="2">${esc(s.main)}</textarea>
+    <div class="hint">${!cta&&lab?esc(lab[1])+' ':''}줄바꿈하면 한 줄씩 나와요. <b>*별표*</b>로 감싼 단어는 살구색으로 강조돼요.</div>
+    ${cta?'':(()=>{const tabs=[...Object.keys(HOOKS),...(st.hooks?['style']:[])];if(!tabs.includes(hookTab))hookTab='neg';
+      const cur=hookTab==='style'?{tip:'이 영상 스타일에 맞춘 예시예요.',list:st.hooks}:HOOKS[hookTab];
+      return `<div class="hook-box"><div class="hook-tabs" role="tablist" aria-label="후킹 패턴">${tabs.map(k=>`<button role="tab" data-ht="${k}" class="${k===hookTab?'on':''}" aria-selected="${k===hookTab}">${k==='style'?'이 스타일':HOOKS[k].name}</button>`).join('')}</div>
+      <div class="hint">${esc(cur.tip)}${sel===0?' 첫 장면에는 부정형·호기심형이 가장 잘 멈춰 세워요.':''}</div>
+      <div class="hooks">${cur.list.map(h=>`<button data-h="${esc(h)}">${esc(h.replace(/\*/g,'').replace(/\n/g,' / '))}</button>`).join('')}</div></div>`})()}
+  </div>
+  <div id="aiBox"></div>
+  <div class="field"><label for="f-sub">${cta?'버튼 문구':'작은 문구'}</label><input type="text" id="f-sub" value="${esc(s.sub)}" placeholder="${cta?'지금 문의주세요':'(선택) 큰 문구 아래에 나와요'}"></div>
+  ${cta?`<div class="field"><label for="f-note">아래 안내 문구</label><input type="text" id="f-note" value="${esc(s.note)}"></div>`:''}
+  <div class="row" style="justify-content:space-between">
+    <div class="dur"><span class="field"><label>길이</label></span><button class="btn sm" id="dM" aria-label="줄이기">−</button><output id="dV">${s.dur.toFixed(st.bpm?2:1)}초</output><button class="btn sm" id="dP" aria-label="늘리기">＋</button></div>
+    <div class="seg" role="group" aria-label="장면 종류"><button id="kN" class="${cta?'':'on'}">일반</button><button id="kC" class="${cta?'on':''}">문의 화면</button></div>
+  </div>
+  ${cta?'':`<label class="toggle"><input type="checkbox" id="slow" ${s.slow?'checked':''}> 슬로모션 ${hasVid?'':'<span class="note">(영상을 넣었을 때 적용돼요)</span>'}</label>`}
+  ${st.freeze&&!cta?`<div class="field"><label for="fzR">멈추는 시점 <output id="fzV">${(s.fz*s.dur).toFixed(1)}초</output></label><input type="range" id="fzR" min="0.1" max="0.9" step="0.05" value="${s.fz}" style="accent-color:var(--apricot)"><div class="hint">움직임이 가장 잘 보이는 순간에 맞춰주세요. 미리보기가 그 순간으로 이동해요.</div></div>`:''}
+  ${st.carry&&!cta&&!s.media&&resolved(sel).m?'<div class="note">앞 장면 영상을 이어서 쓰고 있어요. 다른 영상을 쓰려면 위에서 넣어주세요.</div>':''}
+  <button class="btn sm" id="fit" style="justify-self:start">전체 길이 추천 ${st.len}초에 맞추기${st.bpm?' (박자 단위)':''}</button>
+  <div class="blurbox">
+    <div class="label"><span>얼굴 블러</span><button class="btn sm" id="bAdd">＋ 블러 추가</button></div>
+    ${s.blurs.length?`<div class="note">미리보기에서 점선 원을 끌어서 얼굴 위에 놓으세요. 얼굴만 가리게 크기를 맞춰주세요.</div>
+      ${selBlur>=0?`<div class="field"><label for="bR">크기</label><input type="range" id="bR" min="0.05" max="0.35" step="0.005" value="${s.blurs[selBlur].r}"></div><button class="btn sm danger" id="bDel" style="justify-self:start">이 블러 지우기</button>`:'<div class="note">조절할 원을 미리보기에서 눌러 선택하세요.</div>'}`
+      :'<div class="note">얼굴이 나오는 장면에만 추가하세요. 화면이 움직이는 스타일은 원을 조금 넉넉하게 잡아주세요.</div>'}
+  </div>`;
+  const $=id=>panel.querySelector('#'+id);
+  $('mL')&&($('mL').onclick=()=>{[scenes[sel-1],scenes[sel]]=[scenes[sel],scenes[sel-1]];save();selectScene(sel-1)});
+  $('mR')&&($('mR').onclick=()=>{[scenes[sel+1],scenes[sel]]=[scenes[sel],scenes[sel+1]];save();selectScene(sel+1)});
+  $('del').onclick=()=>{const d=$('del');if(d.dataset.c){scenes.splice(sel,1);save();selectScene(Math.max(0,sel-1))}else{d.dataset.c=1;d.textContent='한 번 더 누르면 삭제'}};
+  panel.querySelectorAll('input[type=file]').forEach(inp=>inp.onchange=()=>{pickSlot=inp.dataset.slot;handleFile(inp)});
+  $('rm')&&($('rm').onclick=()=>{s.media=null;if(s.mKey)IDB.del(s.mKey).catch(()=>{});s.mKey=null;save();renderUI()});
+  $('rm2')&&($('rm2').onclick=()=>{s.media2=null;if(s.m2Key)IDB.del(s.m2Key).catch(()=>{});s.m2Key=null;save();renderUI()});
+  $('f-main').oninput=e=>{s.main=e.target.value;save();renderStrip();queueFonts()};
+  $('f-sub').oninput=e=>{s.sub=e.target.value;save();queueFonts()};
+  $('f-note')&&($('f-note').oninput=e=>{s.note=e.target.value;save();queueFonts()});
+  panel.querySelectorAll('[data-ht]').forEach(b=>b.onclick=()=>{hookTab=b.dataset.ht;renderPanel()});
+  panel.querySelectorAll('[data-h]').forEach(b=>b.onclick=()=>{s.main=b.dataset.h;save();queueFonts();selectScene(sel)});
+  const setDur=d=>{s.dur=Math.round(clamp(d,st.bpm?BEAT:0.5,8)*1000)/1000;save();selectScene(sel)};
+  $('dM').onclick=()=>setDur(s.dur-step);$('dP').onclick=()=>setDur(s.dur+step);
+  $('kN').onclick=()=>{s.kind='normal';save();renderUI()};$('kC').onclick=()=>{s.kind='cta';if(!s.note)s.note='인천 연수구 · 네이버 예약';save();renderUI()};
+  $('slow')&&($('slow').onchange=e=>{s.slow=e.target.checked;save();syncVideos(true)});
+  $('fzR')&&($('fzR').oninput=e=>{s.fz=+e.target.value;$('fzV').textContent=(s.fz*s.dur).toFixed(1)+'초';t=startOf(sel)+Math.min(s.dur-0.05,s.fz*s.dur+0.6);syncVideos(true);save()});
+  $('fit').onclick=()=>{const tg=st.len,f=tg/total();scenes.forEach(x=>{x.dur=st.bpm?Math.max(1,Math.round(x.dur*f/BEAT))*BEAT:Math.round(x.dur*f*10)/10});
+    if(!st.bpm){const diff=Math.round((tg-total())*10)/10;const l=scenes[scenes.length-1];l.dur=Math.round((l.dur+diff)*10)/10}save();selectScene(sel)};
+  $('bAdd').onclick=()=>{s.blurs.push({x:.5,y:.3,r:.14});selBlur=s.blurs.length-1;save();renderUI()};
+  $('bR')&&($('bR').oninput=e=>{s.blurs[selBlur].r=+e.target.value;save()});
+  $('bDel')&&($('bDel').onclick=()=>{s.blurs.splice(selBlur,1);selBlur=-1;save();renderUI()});
+  renderAI();
+}
+function renderUI(){renderStrip();renderPanel();renderPlan();scrub.max=total();cv.classList.toggle('drag',!!(scenes[sel]&&scenes[sel].blurs.length));
+  const on=strip.children[sel];on&&on.scrollIntoView({block:'nearest',inline:'nearest'})}
+
+/* ---------- media ---------- */
+const fileIn=document.getElementById('file');let pickSlot='media';
+const IDB=(()=>{let dbp=null;const open=()=>dbp||(dbp=new Promise((res,rej)=>{const r=indexedDB.open('nb-reels',1);r.onupgradeneeded=()=>r.result.createObjectStore('media');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}));
+  const tx=(mode,fn)=>open().then(db=>new Promise((res,rej)=>{const t=db.transaction('media',mode);const r=fn(t.objectStore('media'));t.oncomplete=()=>res(r&&r.result);t.onerror=()=>rej(t.error)}));
+  return{put:(k,v)=>tx('readwrite',s=>s.put(v,k)),get:k=>tx('readonly',s=>s.get(k)),del:k=>tx('readwrite',s=>s.delete(k)),keys:()=>tx('readonly',s=>s.getAllKeys())}})();
+function makeMedia(blob,name,type){const url=URL.createObjectURL(blob);
+  if((type||blob.type||'').startsWith('video')){const v=document.createElement('video');v.muted=true;v.playsInline=true;v.setAttribute('playsinline','');v.preload='auto';v.src=url;v.loop=true;
+    v.addEventListener('loadeddata',()=>{syncVideos(true)},{once:true});v.load();return{type:'video',el:v,url,name}}
+  const im=new Image();im.onload=()=>{lastKey=''};im.src=url;return{type:'image',el:im,url,name}}
+const handleFile=inp=>{const f=inp.files&&inp.files[0];inp.value='';if(!f)return;const s=scenes[sel];
+  s[pickSlot]=makeMedia(f,f.name,f.type);const kf=pickSlot==='media'?'mKey':'m2Key';
+  if(s[kf])IDB.del(s[kf]).catch(()=>{});const key='m'+Date.now()+Math.random().toString(36).slice(2,7);s[kf]=key;save();
+  IDB.put(key,{blob:f,name:f.name,type:f.type}).catch(()=>{s[kf]=null;save()});renderUI();
+};
+fileIn.onchange=()=>handleFile(fileIn);
+async function restoreMedia(){
+  try{const used=new Set();
+    for(const s of scenes){for(const [kf,slot] of [['mKey','media'],['m2Key','media2']]){if(!s[kf])continue;used.add(s[kf]);
+      const rec=await IDB.get(s[kf]).catch(()=>null);if(rec&&rec.blob)s[slot]=makeMedia(rec.blob,rec.name,rec.type);else s[kf]=null}}
+    const keys=await IDB.keys();keys.forEach(k=>{if(!used.has(k))IDB.del(k).catch(()=>{})});
+    renderUI();syncVideos(true);
+  }catch(e){}
+}
+/* ---------- blur dragging ---------- */
+let drag=null;
+function pt(e){const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width,y:(e.clientY-r.top)/r.height}}
+cv.addEventListener('pointerdown',e=>{const s=scenes[sel];if(exporting||!s)return;const p=pt(e);
+  if(!s.blurs.length){if(!s.media&&s.kind!=='cta'){pickSlot=(S().split&&p.y>.5)?'media2':'media';fileIn.click()}return}
+  let best=-1,bd=1e9;s.blurs.forEach((b,k)=>{const dx=(p.x-b.x),dy=(p.y-b.y)*H/W/1.25,d=Math.hypot(dx,dy);if(d<b.r*1.4&&d<bd){bd=d;best=k}});
+  if(best<0)return;const changed=best!==selBlur;selBlur=best;drag={k:best,ox:p.x-s.blurs[best].x,oy:p.y-s.blurs[best].y};cv.setPointerCapture(e.pointerId);if(changed)renderPanel()});
+cv.addEventListener('pointermove',e=>{if(!drag)return;const p=pt(e),b=scenes[sel].blurs[drag.k];b.x=clamp(p.x-drag.ox);b.y=clamp(p.y-drag.oy)});
+cv.addEventListener('pointerup',()=>{if(drag){drag=null;save()}});
+
+document.getElementById('badge').checked=showBadge;
+document.getElementById('badge').onchange=e=>{showBadge=e.target.checked;save()};
+
+/* ---------- AI copy suggestions ---------- */
+let ai=null,aiImg=false,aiMax=1,aiBusy=null;const sugs={};let plan=null,planErr='';
+const BASE=`[샵 정보]
+- 새로운뷰티: 인천 연수구 1인 뷰티샵. 에너지 테라피 관리, 슬로우에이징 철학.
+- 대표 관리 프로그램: 3D BODY RESET (체형 균형·라인 관리). 이 이름은 여러 장면에 반복해도 됨.
+- 고객층: 30~50대 여성. 살이 안 빠지는 고민, 체형 틀어짐, 붓기, 나이 들며 달라지는 몸, 만성 피로.
+
+[공통 규칙]
+- 인스타 릴스 9:16. 한 화면에 한 메시지만. 줄바꿈은 \\n. 가장 중요한 단어 하나만 *별표*로 감싸 강조(선택).
+- 작은 문구(sub)는 없어도 됨. 있으면 16자 이내.
+- 장면끼리 같은 질문이나 같은 대답을 반복하지 말 것. 3D BODY RESET 이름은 예외.
+- "완치", "100%", "무조건 빠짐" 같은 과장·의료 효과 단정 표현 금지. 측정값·수치를 지어내지 말 것.
+- 사진·영상에 실제로 보이는 내용(관리 장면, 기구, 공간, 몸 라인, 손동작 등)과 문구가 맞아야 함. 보이지 않는 것을 지어내지 말 것.
+
+[후킹 패턴 — 요즘 릴스에서 많이 쓰는 방식]
+- 부정형: 손해·실수를 짚음. 예) 이렇게 빼면 라인부터 무너져요 / 풀기만 하면 다시 뭉치는 이유
+- 호기심형: 상식을 뒤집어 "왜?"를 만듦. 예) 살이 아니라 자세가 찐 거예요 / 덜 먹는데 왜 안 빠질까?
+- 문제 제기형: 매일 겪는 고민을 질문으로. 예) 자고 일어나도 몸이 무거우세요?
+- 비교형: A vs B. 예) 살 빼는 관리 vs 균형 잡는 관리
+- 숫자형: 개수를 먼저. 예) 체형 무너지는 신호 3가지
+- 결과 먼저형: 실제 변화 장면이 보일 때만.
+- 고백형: 원장 본인 경험 — 사용자가 알려준 경우가 아니면 쓰지 말 것.
+- 첫 장면은 부정형과 호기심형을 우선 섞어 쓰고, 이후 장면은 문제 공감 → 3D BODY RESET 해결 → 변화 기대 흐름으로.
+- 각 추천의 why에는 어떤 패턴을 썼는지 적을 것.`;
+const brief=()=>{const st=S();return `${BASE}
+
+[영상 스타일] ${st.no}. ${st.name} (${st.en})
+- 연출: ${st.desc}
+- 예시 흐름: ${st.ex}
+- 이 스타일 문구 규칙: ${st.rule}`};
+function snap(m){return new Promise(res=>{const mi=mInfo(m);if(!mi)return res(null);
+  const c=document.createElement('canvas');c.width=540;c.height=960;const x=c.getContext('2d');const k=Math.max(540/mi.sw,960/mi.sh);x.drawImage(mi.el,(540-mi.sw*k)/2,(960-mi.sh*k)/2,mi.sw*k,mi.sh*k);c.toBlob(b=>res(b),'image/jpeg',.85)})}
+const plain=s=>(s.main||'').replace(/\n/g,' / ');
+const hl=t=>esc(t).replace(/\*([^*]+)\*/g,'<em>$1</em>');
+const unN=x=>String(x).replace(/\\n/g,'\n');
+function errCopy(c){return({not_granted:'Claude 사용을 허용하지 않아 추천을 쓸 수 없어요.',sampling_disabled:'이 계정에서는 추천 기능을 쓸 수 없어요.',rate_limited:'요청이 많아요. 잠시 후 다시 눌러주세요.',image_rejected:'이 사진은 읽지 못했어요. 다른 사진으로 바꿔보세요.',invalid_json:'추천을 정리하지 못했어요. 다시 눌러주세요.',session_expired:'다시 로그인한 뒤 눌러주세요.',refused:'이 내용으로는 추천을 만들지 못했어요.'})[c]||'추천을 받지 못했어요. 다시 눌러주세요.'}
+function renderAI(){
+  const box=panel.querySelector('#aiBox');if(!box)return;const s=scenes[sel];
+  if(!ai){box.innerHTML='';return}
+  const st=sugs[s.id];const busy=aiBusy&&aiBusy.kind==='scene'&&aiBusy.id===s.id;
+  const label=s.media?(s.kind==='cta'?'✨ 이 화면에 맞는 문의 문구 추천':'✨ 이 사진·영상에 맞는 문구 추천'):'✨ 문구 추천 (사진을 넣으면 더 정확해요)';
+  box.innerHTML=`<div class="ai">
+    <div class="row"><button class="ai-btn" id="aiGo" ${aiBusy?'disabled':''}>${label}</button>${busy?'<button class="btn sm" id="aiStop">멈추기</button>':''}</div>
+    ${busy?`<div class="thinking"><span class="dot"></span>${esc(S().name)} 스타일로 문구를 고르는 중이에요 (10~30초)</div>`:''}
+    ${st&&st.err?`<div class="note">${esc(st.err)}</div>`:''}
+    ${st&&st.list?`<div class="sugs">${st.list.map((o,k)=>`<button class="sug" data-k="${k}"><b>${hl(o.main)}</b>${o.sub?`<span>${esc(o.sub)}</span>`:''}${o.why?`<small>${esc(o.why)}</small>`:''}</button>`).join('')}</div><div class="note">눌러서 바로 적용하세요. 적용 후에도 직접 고칠 수 있어요.</div>`:''}
+  </div>`;
+  box.querySelector('#aiGo').onclick=()=>suggestScene(sel);
+  const stop=box.querySelector('#aiStop');stop&&(stop.onclick=()=>aiBusy&&aiBusy.ctl.abort());
+  box.querySelectorAll('.sug').forEach(b=>b.onclick=()=>{const o=st.list[+b.dataset.k];s.main=o.main;s.sub=o.sub||'';save();queueFonts();selectScene(sel)});
+}
+async function suggestScene(i){
+  const s=scenes[i];if(aiBusy)return;const ctl=new AbortController();aiBusy={kind:'scene',id:s.id,ctl};sugs[s.id]={};renderAI();renderPlan();
+  const others=scenes.map((x,k)=>k===i?null:`${k+1}번 장면: ${plain(x)}${x.sub?' / '+x.sub:''}`).filter(Boolean).join('\n');
+  const pos=s.kind==='cta'?'마지막 문의(CTA) 장면. main은 샵 이름 또는 짧은 마무리, sub는 "문의주세요"처럼 행동을 부르는 버튼 문구.':i===0?'첫 장면(후킹). 1초 안에 스크롤을 멈추게.':`${i+1}번째 장면 (전체 ${scenes.length}개 중).`;
+  const imgs=[];if(aiImg){const a=await snap(resolved(i).m);if(a)imgs.push(a);if(S().split&&imgs.length<aiMax){const b=await snap(s.media2);if(b)imgs.push(b)}}
+  const prompt=`${brief()}
+
+[지금 만들 장면] ${pos}
+${imgs.length?(S().split&&imgs.length>1?'첨부 이미지 1번은 위 화면, 2번은 아래 화면이에요.':'첨부 이미지는 이 장면에 들어갈 사진(영상이면 한 프레임)이에요.')+' 보이는 내용에 맞춰 써주세요.':'이미지는 없어요. 앞뒤 장면 흐름에 맞춰 써주세요.'}
+현재 문구: ${plain(s)||'(없음)'}${s.sub?' / '+s.sub:''}
+
+[다른 장면 문구 — 겹치지 않게]
+${others||'(없음)'}
+
+이 스타일에 맞는 서로 다른 후보 3개를 주세요. 다른 텍스트 없이 JSON 배열만:
+[{"main":"첫 줄\\n둘째 줄","sub":"","why":"이 문구를 고른 이유 한 줄"}]`;
+  try{const r=await ai.json(prompt,{signal:ctl.signal,cache:false,...(imgs.length?{images:imgs}:{})});
+    const list=(Array.isArray(r)?r:[]).filter(o=>o&&typeof o.main==='string'&&o.main.trim()).slice(0,4).map(o=>({main:unN(o.main),sub:o.sub?String(o.sub):'',why:o.why?String(o.why):''}));
+    sugs[s.id]=list.length?{list}:{err:'추천을 정리하지 못했어요. 다시 눌러주세요.'};
+  }catch(e){sugs[s.id]=e&&e.code==='cancelled'?{}:{err:errCopy(e&&e.code)};if(e&&['not_granted','sampling_disabled'].includes(e.code))ai=null}
+  aiBusy=null;renderAI();renderPlan();
+}
+const planBox=document.getElementById('planBox');
+function renderPlan(){
+  if(!ai){planBox.hidden=true;return}planBox.hidden=false;
+  const busy=aiBusy&&aiBusy.kind==='plan';const n=scenes.filter(s=>s.media).length;
+  planBox.innerHTML=`<div class="label" style="color:inherit"><span>전체 추천 · ${esc(S().name)}</span></div>
+    <div class="note">넣은 사진·영상을 모두 보고 이 스타일에 맞게 장면 순서와 문구를 한 번에 짜드려요.${n?'':' 먼저 장면에 사진·영상을 넣어주세요.'}</div>
+    <div class="row"><button class="ai-btn" id="planGo" ${aiBusy||!n?'disabled':''}>✨ 순서·문구 전체 추천</button>${busy?'<button class="btn sm" id="planStop">멈추기</button>':''}</div>
+    ${busy?'<div class="thinking"><span class="dot"></span>장면 전체를 보고 흐름을 짜는 중이에요 (20~60초)</div>':''}
+    ${planErr?`<div class="note">${esc(planErr)}</div>`:''}
+    ${plan?`<ol class="plan-list">${plan.items.map(it=>`<li><b>${hl(it.main)}</b>${it.sub?` · ${esc(it.sub)}`:''} <small class="note">(${it.from}번 장면 사용)</small></li>`).join('')}</ol>
+      ${plan.why?`<div class="note">${esc(plan.why)}</div>`:''}
+      <div class="row"><button class="btn accent" id="planApply">이대로 적용</button><button class="btn sm" id="planClose">닫기</button></div>`:''}`;
+  const q=id=>planBox.querySelector('#'+id);
+  q('planGo').onclick=suggestPlan;q('planStop')&&(q('planStop').onclick=()=>aiBusy&&aiBusy.ctl.abort());
+  q('planClose')&&(q('planClose').onclick=()=>{plan=null;renderPlan()});
+  q('planApply')&&(q('planApply').onclick=applyPlan);
+}
+async function suggestPlan(){
+  if(aiBusy)return;const ctl=new AbortController();aiBusy={kind:'plan',ctl};plan=null;planErr='';renderPlan();renderAI();
+  const body=scenes.map((s,k)=>({s,k})).filter(x=>x.s.kind!=='cta');
+  const imgs=[],desc=[];
+  for(const {s,k} of body){let b=null;if(aiImg&&imgs.length<aiMax)b=await snap(s.media);if(b)imgs.push(b);desc.push(`장면${k+1}: ${b?`첨부 이미지 ${imgs.length}번째`:'이미지 없음'} / 현재 문구 "${plain(s)}"`)}
+  const prompt=`${brief()}
+
+[장면 목록] 마지막 문의(CTA) 장면은 따로 고정이라 아래에는 없어요.
+${desc.join('\n')}
+
+할 일:
+1) 이미지들을 보고 이 스타일의 예시 흐름처럼 가장 끌리는 순서로 장면을 정해주세요.
+2) 정한 순서대로 각 장면 문구를 이 스타일 규칙에 맞게 써주세요. 장면끼리 겹치는 질문·대답 금지.
+3) 마지막 문의 장면의 sub(버튼 문구)도 하나 정해주세요.
+모든 장면(${body.length}개)을 빠짐없이 한 번씩 써야 해요. 다른 텍스트 없이 JSON만:
+{"items":[{"scene":3,"main":"첫 줄\\n둘째 줄","sub":""}],"ctaSub":"지금 문의주세요","why":"이 순서로 짠 이유 한 줄"}`;
+  try{const r=await ai.json(prompt,{signal:ctl.signal,cache:false,...(imgs.length?{images:imgs}:{})});
+    const valid=new Set(body.map(x=>x.k+1)),seen=new Set();
+    const items=(r&&Array.isArray(r.items)?r.items:[]).filter(it=>it&&valid.has(+it.scene)&&!seen.has(+it.scene)&&seen.add(+it.scene)&&typeof it.main==='string')
+      .map(it=>({from:+it.scene,id:scenes[+it.scene-1].id,main:unN(it.main),sub:it.sub?String(it.sub):''}));
+    body.forEach(x=>{if(!seen.has(x.k+1))items.push({from:x.k+1,id:x.s.id,main:x.s.main,sub:x.s.sub})});
+    plan={items,ctaSub:r&&r.ctaSub?String(r.ctaSub):'',why:r&&r.why?String(r.why):''};
+  }catch(e){planErr=e&&e.code==='cancelled'?'':errCopy(e&&e.code);if(e&&['not_granted','sampling_disabled'].includes(e.code))ai=null}
+  aiBusy=null;renderUI();
+}
+function applyPlan(){
+  if(!plan)return;const byId=Object.fromEntries(scenes.map(s=>[s.id,s]));const cta=scenes.filter(s=>s.kind==='cta');
+  const ordered=plan.items.map(it=>{const s=byId[it.id];s.main=it.main;s.sub=it.sub;return s}).filter(Boolean);
+  if(plan.ctaSub&&cta[0])cta[0].sub=plan.ctaSub;
+  scenes.splice(0,scenes.length,...ordered,...cta);plan=null;save();queueFonts();selectScene(0);
+}
+(async()=>{try{const s=window.claude&&window.claude.use?await window.claude.use('sample'):null;if(!s)return;ai=s;
+  const lim=await s.limits().catch(()=>null);aiImg=!!(lim&&lim.images);aiMax=lim&&lim.images?lim.images.maxCount:1;renderPlan();renderAI()}catch(e){}})();
+
+/* ---------- export ---------- */
+const exportBtn=document.getElementById('exportBtn'),fill_=document.getElementById('fill'),exportLabel=document.getElementById('exportLabel');
+const resultEl=document.getElementById('result'),outVid=document.getElementById('outVid'),saveBtn=document.getElementById('saveBtn'),saveMsg=document.getElementById('saveMsg');
+let rec=null,chunks=[],outBlob=null,outExt='mp4';
+function pickMime(){const list=['video/mp4;codecs=avc1.42E01F','video/mp4;codecs=avc1','video/mp4','video/webm;codecs=vp9','video/webm'];
+  if(!window.MediaRecorder)return null;for(const m of list){try{if(MediaRecorder.isTypeSupported(m))return m}catch(e){}}return ''}
+exportBtn.onclick=async()=>{
+  if(exporting)return;
+  const mime=pickMime();
+  if(mime===null||!cv.captureStream){exportLabel.textContent='이 브라우저에선 저장이 안 돼요. 크롬이나 사파리 최신 버전에서 열어주세요';return}
+  exportLabel.textContent='글꼴 준비 중…';await loadFonts();
+  setPlaying(false);t=0;curScene=-1;selBlur=-1;
+  const v0=vids(scenes[0]);
+  await Promise.all(v0.map(v=>new Promise(r=>{let done=false;const f=()=>{if(!done){done=true;r()}};v.addEventListener('seeked',f,{once:true});try{v.currentTime=0}catch(e){f()}setTimeout(f,800)})));
+  const stream=cv.captureStream(FPS);chunks=[];
+  try{rec=new MediaRecorder(stream,mime?{mimeType:mime,videoBitsPerSecond:8e6}:{videoBitsPerSecond:8e6})}catch(e){rec=new MediaRecorder(stream)}
+  outExt=(rec.mimeType||mime||'').includes('mp4')?'mp4':'webm';
+  rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
+  rec.onstop=()=>{outBlob=new Blob(chunks,{type:rec.mimeType||('video/'+outExt)});outVid.src=URL.createObjectURL(outBlob);resultEl.hidden=false;
+    saveMsg.textContent=outExt==='mp4'?'인스타그램에 바로 올릴 수 있는 MP4예요.':'이 브라우저는 WebM으로만 만들 수 있어요. 휴대폰(사파리·크롬)에서 만들면 MP4로 나와요.';
+    exportLabel.textContent='다시 만들기';fill_.style.width='0';exporting=false;exportBtn.disabled=false;renderUI();resultEl.scrollIntoView({behavior:'smooth',block:'nearest'})};
+  exporting=true;exportBtn.disabled=true;exportLabel.textContent='영상 만드는 중… 화면을 켜 두세요';
+  rec.start(250);last=performance.now();setPlaying(true);
+};
+function finishExport(){setPlaying(false);setTimeout(()=>{rec&&rec.state!=='inactive'&&rec.stop()},150)}
+saveBtn.onclick=async()=>{
+  if(!outBlob)return;const name=`새로운뷰티_${S().en.split(' ')[0]}_${new Date().toISOString().slice(0,10)}.${outExt}`;
+  const file=new File([outBlob],name,{type:outBlob.type||('video/'+outExt)});
+  try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file]});saveMsg.textContent='저장했어요. 아이폰은 공유 창에서 "비디오 저장"을 누르면 사진 앱에 들어가요.';return}}
+  catch(e){if(e&&e.name==='AbortError'){saveMsg.textContent='저장을 취소했어요.';return}}
+  const a=document.createElement('a');a.href=URL.createObjectURL(file);a.download=name;document.body.appendChild(a);a.click();a.remove();
+  saveMsg.textContent='다운로드 폴더에 저장했어요. 갤러리나 파일 앱에서 확인하세요.';
+};
+
+/* ---------- install prompt ---------- */
+(()=>{const box=document.getElementById('install'),how=document.getElementById('installHow'),btn=document.getElementById('installBtn');
+  const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone;let dismissed=false;try{dismissed=localStorage.getItem('nb-install-x')==='1'}catch(e){}
+  if(standalone||dismissed)return;
+  const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
+  how.textContent=ios?'사파리 아래쪽 공유 버튼(□↑)을 누르고 "홈 화면에 추가"를 누르세요.':'크롬 오른쪽 위 ⋮ 메뉴에서 "앱 설치" 또는 "홈 화면에 추가"를 누르세요.';box.hidden=false;
+  let ev=null;addEventListener('beforeinstallprompt',e=>{e.preventDefault();ev=e;btn.hidden=false;how.textContent='아래 버튼을 누르면 바로 설치돼요.'});
+  btn.onclick=async()=>{if(!ev)return;ev.prompt();const r=await ev.userChoice.catch(()=>null);if(r&&r.outcome==='accepted')box.hidden=true;ev=null};
+  document.getElementById('installClose').onclick=()=>{box.hidden=true;try{localStorage.setItem('nb-install-x','1')}catch(e){}};
+  addEventListener('appinstalled',()=>{box.hidden=true});
+})();
+if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+
+fontMode=fontModeSaved;fontSeg.querySelectorAll('button').forEach(b=>b.onclick=()=>{fontMode=b.dataset.f;lastKey='';save();queueFonts();renderStyles()});
+renderStyles();renderUI();t=Math.min(1.6,scenes[0].dur-0.05);loadFonts();restoreMedia();
+requestAnimationFrame(n=>{last=n;frame(n)});
+})();
+</script>
+</body>
+</html>

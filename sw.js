@@ -1,5 +1,5 @@
 // 새로운뷰티 릴스 메이커 — offline cache
-const VERSION = 'reels-v1';
+const VERSION = 'reels-v2';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png', './apple-touch-icon.png'];
 
 self.addEventListener('install', (e) => {
